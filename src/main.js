@@ -23,11 +23,11 @@ const render = (container, template, place) => {
 };
 
 clearInnerHTML(tripMain);
-render(tripMain, createRouteInfoTemplate(), `afterbegin`);
+render(tripMain, createRouteInfoTemplate(points), `afterbegin`);
 render(tripEvents, createSortFormTemplate(), `beforeend`);
 render(tripEvents, createTripEventsListTemplate(), `beforeend`);
 const tripEventsList = document.querySelector(`.trip-events__list`);
-render(tripEventsList, createFormEditTemplate(), `beforeend`);
+render(tripEventsList, createFormEditTemplate(points[0]), `beforeend`);
 
 for (let i = 0; i < NUMBER_OF_LIST_ITEMS; i++) {
   render(tripEventsList, createTripEventsListItemTemplate(points[i]), `beforeend`);

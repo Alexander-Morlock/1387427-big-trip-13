@@ -1,13 +1,34 @@
-const createRouteInfoTemplate = () => {
+import dayjs from "dayjs";
+const createRouteInfoTemplate = (points) => {
+
+  const generateRouteTitle = () => {
+    return points.map((el) => el.destination.title).join(` — `);
+  };
+
+  const getTotalPrice = () => {
+    let total = 0;
+    points.forEach((point) => {
+      total += point.price;
+      if (point.offers) {
+        point.offers.forEach((offer) => {
+          if (offer.isChecked) {
+            total += offer.price;
+          }
+        });
+      }
+    });
+    return total;
+  };
+
   return `<section class="trip-main__trip-info  trip-info">
     <div class="trip-info__main">
-      <h1 class="trip-info__title">Amsterdam — Chamonix — Geneva</h1>
+      <h1 class="trip-info__title">${generateRouteTitle()}</h1>
 
-      <p class="trip-info__dates">Mar 18&nbsp;—&nbsp;20</p>
+      <p class="trip-info__dates">${dayjs(points[0].time.start).format(`MMM DD`)}&nbsp;—&nbsp;${dayjs(points[0].time.end).format(`DD`)}</p>
     </div>
 
     <p class="trip-info__cost">
-      Total: €&nbsp;<span class="trip-info__cost-value">1230</span>
+      Total: €&nbsp;<span class="trip-info__cost-value">${getTotalPrice()}</span>
     </p>
   </section>
 
@@ -42,4 +63,4 @@ const createRouteInfoTemplate = () => {
   <button class="trip-main__event-add-btn  btn  btn--big  btn--yellow" type="button">New event</button>`;
 };
 
-export {createRouteInfoTemplate};
+export { createRouteInfoTemplate };

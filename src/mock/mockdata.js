@@ -30,11 +30,31 @@ const generateTripType = () => {
 
 const generateDestination = () => {
   const destinations = [
-    `New York`,
-    `San-Francisco`,
-    `Prague`,
-    `Munich`,
-    `Paris`
+    {
+      title: `New York`,
+      photoUrl: `http://picsum.photos/248/152?r=` + Math.random(),
+      description: `New York City (NYC), often called simply New York, is the most populous city in the United States. With an estimated 2019 population of 8,336,817 distributed over about 302.6 square miles (784 km2), New York City is also the most densely populated major city in the United States.`
+    },
+    {
+      title: `San-Francisco`,
+      photoUrl: `http://picsum.photos/248/152?r=` + Math.random(),
+      description: `San Francisco, officially the City and County of San Francisco, is the cultural, commercial, and financial center of Northern California. San Francisco is the 16th most populous city in the United States, and the fourth most populous in California, with 881,549 residents as of 2019.`
+    },
+    {
+      title: `Prague`,
+      photoUrl: `http://picsum.photos/248/152?r=` + Math.random(),
+      description: `Prague is the capital and largest city in the Czech Republic, the 13th largest city in the European Union and the historical capital of Bohemia.`
+    },
+    {
+      title: `Munich`,
+      photoUrl: `http://picsum.photos/248/152?r=` + Math.random(),
+      description: `Munich is the capital and most populous city of Bavaria. With a population of 1,558,395 inhabitants as of July 31, 2020, it is the third-largest city in Germany, after Berlin and Hamburg, and thus the largest which does not constitute its own state, as well as the 11th-largest city in the European Union`
+    },
+    {
+      title: `Paris`,
+      photoUrl: `http://picsum.photos/248/152?r=` + Math.random(),
+      description: `Paris is the capital and most populous city of France, with an estimated population of 2,148,271 residents as of 2020, in an area of 105 square kilometres (41 square miles).Since the 17th century, Paris has been one of Europe's major centres of finance, diplomacy, commerce, fashion, science and arts.`
+    }
   ];
   return destinations[randomInt(0, destinations.length - 1)];
 };
@@ -42,28 +62,43 @@ const generateDestination = () => {
 const generateOffers = () => {
   const offers = [
     {
-      title: null,
-      price: null
+      // empty
     },
     {
       title: `Order Uber`,
-      price: randomInt(10, 50)
+      type: `uber`,
+      price: randomInt(10, 50),
+      isChecked: false
     },
     {
       title: `Add luggage`,
-      price: randomInt(10, 50)
+      type: `luggage`,
+      price: randomInt(10, 50),
+      isChecked: false
     },
     {
       title: `Switch to comfort`,
-      price: randomInt(10, 50)
+      type: `comfort`,
+      price: randomInt(10, 50),
+      isChecked: false
     },
     {
       title: `Add meal`,
-      price: randomInt(10, 50)
+      type: `meal`,
+      price: randomInt(10, 50),
+      isChecked: false
     },
     {
       title: `Choose seats`,
-      price: randomInt(10, 50)
+      type: `seats`,
+      price: randomInt(10, 50),
+      isChecked: false
+    },
+    {
+      title: `Travel by train`,
+      type: `train`,
+      price: randomInt(10, 50),
+      isChecked: false
     }
   ];
 
@@ -75,12 +110,12 @@ const generateOffers = () => {
     offersCombination.push(offers[i]);
   }
 
-  if (offersCombination[0].title === null && offersCombination.length > 1) {
+  if (offersCombination[0].title === undefined && offersCombination.length > 1) {
     offersCombination.shift();
   }
 
   let result = shuffle(offersCombination);
-  if (result.length === 1 && result[0].title === null) {
+  if (result.length === 1 && result[0].title === undefined) {
     result = undefined;
   }
   return result;
@@ -96,8 +131,8 @@ export const getGeneratedPoint = () => {
     stopType: generateStopType(),
     tripType: generateTripType(),
     time: {
-      start: dayjs().format(`YYYY-MM-DDTHH:MM`),
-      end: dayjs().add(randomInt(10, 5000), `minute`).format(`YYYY-MM-DDTHH:MM`)
+      start: dayjs().format(`YYYY-MM-DDThh:mm`),
+      end: dayjs().add(randomInt(10, 5000), `minute`).format(`YYYY-MM-DDThh:mm`)
     },
     offers: generateOffers(),
     isFavorite: generateIsFavorite(),
