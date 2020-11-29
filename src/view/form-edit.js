@@ -6,7 +6,7 @@ const createFormEditTemplate = (point) => {
     let offers = ``;
 
     if (point.offers) {
-      point.offers.forEach((offer,index) => {
+      point.offers.forEach((offer, index) => {
         offers += `<div class="event__available-offers">
     <div class="event__offer-selector">
       <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-${index + 1}" type="checkbox" name="event-offer-${offer.type}">
@@ -136,4 +136,4 @@ const createFormEditTemplate = (point) => {
 </li>`;
 };
 
-export { createFormEditTemplate };
+export {createFormEditTemplate};
