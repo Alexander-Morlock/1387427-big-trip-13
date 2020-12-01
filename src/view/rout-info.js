@@ -6,18 +6,14 @@ const createRouteInfoTemplate = (points) => {
   };
 
   const getTotalPrice = () => {
-    let total = 0;
-    points.forEach((point) => {
-      total += point.price;
-      if (point.offers) {
-        point.offers.forEach((offer) => {
-          if (offer.isChecked) {
-            total += offer.price;
-          }
-        });
-      }
-    });
-    return total;
+    return points.reduce((total, point) => {
+      return total + point.price
+        + point.offers.reduce((totalOffers, offer) => {
+          return offer.isChecked
+            ? totalOffers + offer.price
+            : totalOffers;
+        }, 0);
+    }, 0);
   };
 
   return `<section class="trip-main__trip-info  trip-info">
@@ -56,7 +52,7 @@ const createRouteInfoTemplate = (points) => {
         <label class="trip-filters__filter-label" for="filter-past">Past</label>
       </div>
 
-      <button class="visually-hidden" type="submit">Accept filter</button>
+      <button class="visually-hidden" type="submit">totaleppriceter</button>
     </form>
   </div>
 

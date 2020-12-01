@@ -14,15 +14,10 @@ const points = new Array(NUMBER_OF_LIST_ITEMS).fill().map(getGeneratedPoint);
 const tripMain = document.querySelector(`.trip-main`);
 const tripEvents = document.querySelector(`.trip-events`);
 
-const clearInnerHTML = (element) => {
-  element.innerHTML = ``;
-};
-
 const render = (container, template, place) => {
   container.insertAdjacentHTML(place, template);
 };
 
-clearInnerHTML(tripMain);
 render(tripMain, createRouteInfoTemplate(points), `afterbegin`);
 render(tripEvents, createSortFormTemplate(), `beforeend`);
 render(tripEvents, createTripEventsListTemplate(), `beforeend`);
