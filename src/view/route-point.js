@@ -1,9 +1,5 @@
 import dayjs from "dayjs";
-
-const createTripEventsListTemplate = () => {
-  return `<ul class="trip-events__list">
-  </ul>`;
-};
+import {createElement} from '../utils.js';
 
 const getDuration = (timeStart, timeEnd) => {
   const start = new Date(timeStart).getTime();
@@ -103,7 +99,30 @@ const createTripEventsListItemTemplate = ({
 </li>`;
 };
 
-export {
-  createTripEventsListTemplate,
-  createTripEventsListItemTemplate
-};
+export default class RoutePoint {
+  constructor(point) {
+    this._element = null;
+    this._point = point;
+  }
+
+  getTemplate() {
+    return createTripEventsListItemTemplate(this._point);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  static getListTemplate() {
+    return createElement(`<ul class="trip-events__list"></ul>`);
+  }
+
+  removeElement() {
+    this._element = null;
+    this._point = null;
+  }
+}

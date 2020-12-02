@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import {createElement} from '../utils.js';
 const createRouteInfoTemplate = (points) => {
 
   const generateRouteTitle = () => {
@@ -59,4 +60,26 @@ const createRouteInfoTemplate = (points) => {
   <button class="trip-main__event-add-btn  btn  btn--big  btn--yellow" type="button">New event</button>`;
 };
 
-export {createRouteInfoTemplate};
+export default class RouteInfo {
+  constructor(points) {
+    this._element = null;
+    this._points = points;
+  }
+
+  getTemplate() {
+    return createRouteInfoTemplate(this._points);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+    this._points = null;
+  }
+}
