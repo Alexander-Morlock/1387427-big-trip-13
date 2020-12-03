@@ -24,7 +24,7 @@ const createFormEditTemplate = (point) => {
   const generatePhotos = () => {
     return point.destination.photoUrl.map((photo) => {
       return `<img class="event__photo" src="${photo}" alt="Event photo">`;
-    }).join();
+    }).join(``);
   };
 
   return `<li class="trip-events__item">

@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 
-const MIN_NUMBER_OF_PHOTOS = 1;
+const MIN_NUMBER_OF_PHOTOS = 3;
 const MAX_NUMBER_OF_PHOTOS = 5;
 
 const randomInt = (a = 0, b = 1) => {
