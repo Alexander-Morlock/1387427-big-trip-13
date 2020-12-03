@@ -12,8 +12,14 @@ const header = document.querySelector(`.page-header`);
 
 const updateRouteInfo = () => {
   header.firstChild.remove();
-  renderElement(header, new RouteInfo(points).getElement(), RenderPosition.AFTERBEGIN);
-}; updateRouteInfo();
+  if (points.length) {
+    renderElement(header, new RouteInfo(points).getElement(), RenderPosition.AFTERBEGIN);
+  } else {
+    renderElement(header, new RouteInfo().getEmptyListHeader(), RenderPosition.AFTERBEGIN);
+  }
+};
+
+updateRouteInfo();
 
 const tripEvents = document.querySelector(`.trip-events`);
 renderElement(tripEvents, new SortForm().getElement(), RenderPosition.BEFOREEND);
@@ -56,7 +62,7 @@ const switchToEdit = (point) => {
     points.splice(index, NUMBER_OF_ELEMENTS_TO_REMOVE);
     route.splice(index, NUMBER_OF_ELEMENTS_TO_REMOVE);
     pointEdit.remove();
-    updateRouteInfo(points);
+    updateRouteInfo();
   });
   route[route.indexOf(point)] = pointEdit;
   tripEventsList.replaceChild(pointEdit, point);
