@@ -15,7 +15,9 @@ const updateRouteInfo = () => {
   if (points.length) {
     renderElement(header, new RouteInfo(points).getElement(), RenderPosition.AFTERBEGIN);
   } else {
-    renderElement(header, new RouteInfo().getEmptyListHeader(), RenderPosition.AFTERBEGIN);
+    renderElement(header, new RouteInfo(points).getEmptyListHeader(), RenderPosition.AFTERBEGIN);
+    tripEvents.innerHTML = `<h2 class="visually-hidden">Trip events</h2>
+    <p class="trip-events__msg">Click New Event to create your first point</p>`;
   }
 };
 
@@ -46,7 +48,15 @@ const switchToEdit = (point) => {
   const index = route.indexOf(point);
   const pointEdit = new FormEdit(points[index]).getElement();
 
+  const onEscapeHandler = (evt) => {
+    if (evt.key === `Escape` || evt.key === `Esc`) {
+      document.removeEventListener(`keydown`, onEscapeHandler);
+      switchToNormal(pointEdit);
+    }
+  };
+
   const buttonMinimize = pointEdit.querySelector(`.event__rollup-btn`);
+  document.addEventListener(`keydown`, onEscapeHandler);
   buttonMinimize.addEventListener(`click`, () => {
     switchToNormal(pointEdit);
   });
