@@ -9,13 +9,15 @@ const NUMBER_OF_LIST_ITEMS = 3;
 
 const points = new Array(NUMBER_OF_LIST_ITEMS).fill().map(getGeneratedPoint);
 
-const tripMain = document.querySelector(`.trip-main`);
-const tripEvents = document.querySelector(`.trip-events`);
+const header = document.querySelector(`.page-header`);
+renderElement(header, new RouteInfo(points).getElement(), RenderPosition.AFTERBEGIN);
 
-renderElement(tripMain, new RouteInfo(points).getElement(), RenderPosition.AFTERBEGIN);
+const tripEvents = document.querySelector(`.trip-events`);
 renderElement(tripEvents, new SortForm().getElement(), RenderPosition.BEFOREEND);
-renderElement(tripEvents, RoutePoint.getListTemplate(), RenderPosition.BEFOREEND);
-const tripEventsList = document.querySelector(`.trip-events__list`);
+
+const tripEventsList = new RoutePoint().getListTemplate();
+renderElement(tripEvents, tripEventsList, RenderPosition.BEFOREEND);
+
 renderElement(tripEventsList, new FormEdit(points[0]).getElement(), RenderPosition.BEFOREEND);
 
 for (let i = 0; i < NUMBER_OF_LIST_ITEMS; i++) {

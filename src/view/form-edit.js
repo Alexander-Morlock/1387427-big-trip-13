@@ -21,6 +21,12 @@ const createFormEditTemplate = (point) => {
     return offers;
   };
 
+  const generatePhotos = () => {
+    return point.destination.photoUrl.map((photo) => {
+      return `<img class="event__photo" src="${photo}" alt="Event photo">`;
+    }).join();
+  };
+
   return `<li class="trip-events__item">
   <form class="event event--edit" action="#" method="post">
     <header class="event__header">
@@ -131,6 +137,10 @@ const createFormEditTemplate = (point) => {
       <section class="event__section  event__section--destination">
         <h3 class="event__section-title  event__section-title--destination">Destination</h3>
         <p class="event__destination-description">${point.destination.description}</p>
+        <div class="event__photos-container">
+          <div class="event__photos-tape">
+            ${generatePhotos()}
+          </div>
       </section>
     </section>
   </form>

@@ -117,7 +117,7 @@ export default class RoutePoint {
     return this._element;
   }
 
-  static getListTemplate() {
+  getListTemplate() {
     return createElement(`<ul class="trip-events__list"></ul>`);
   }
 
