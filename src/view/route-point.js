@@ -117,10 +117,6 @@ export default class RoutePoint {
     return this._element;
   }
 
-  getListTemplate() {
-    return createElement(`<ul class="trip-events__list"></ul>`);
-  }
-
   removeElement() {
     this._element = null;
     this._point = null;

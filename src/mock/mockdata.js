@@ -32,10 +32,9 @@ const generateTripType = () => {
 };
 
 const generatePhotos = () => {
-  const photos = [];
-  for (let i = 0; i < randomInt(MIN_NUMBER_OF_PHOTOS, MAX_NUMBER_OF_PHOTOS); i++) {
-    photos.push(`http://picsum.photos/248/152?r=` + Math.random());
-  }
+  const photos = new Array(randomInt(MIN_NUMBER_OF_PHOTOS, MAX_NUMBER_OF_PHOTOS)).fill().map(() => {
+    return `http://picsum.photos/248/152?r=` + Math.random();
+  });
   return photos;
 };
 

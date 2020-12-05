@@ -2,11 +2,13 @@ import FormEdit from './view/form-edit.js';
 import RouteInfo from './view/route-info.js';
 import RoutePoint from './view/route-point.js';
 import SortForm from './view/sort-form.js';
+import EmptyListTemplate from './view/empty-list-template.js';
+import EmptyListHeader from './view/empty-list-header.js';
+import EmptyTripEvents from './view/empty-trip-events.js';
 import {renderElement, RenderPosition} from "./utils.js";
 import {getGeneratedPoint} from './mock/mockdata.js';
 
 const NUMBER_OF_LIST_ITEMS = 3;
-const NUMBER_OF_ELEMENTS_TO_REMOVE = 1;
 const points = new Array(NUMBER_OF_LIST_ITEMS).fill().map(getGeneratedPoint);
 const header = document.querySelector(`.page-header`);
 
@@ -15,9 +17,10 @@ const updateRouteInfo = () => {
   if (points.length) {
     renderElement(header, new RouteInfo(points).getElement(), RenderPosition.AFTERBEGIN);
   } else {
-    renderElement(header, new RouteInfo(points).getEmptyListHeader(), RenderPosition.AFTERBEGIN);
-    tripEvents.innerHTML = `<h2 class="visually-hidden">Trip events</h2>
-    <p class="trip-events__msg">Click New Event to create your first point</p>`;
+    renderElement(header, new EmptyListHeader().getTemplate(), RenderPosition.AFTERBEGIN);
+    tripEvents.append(new EmptyTripEvents().getTemplate());
+    tripEvents.querySelector(`form`).remove();
+    tripEvents.querySelector(`ul`).remove();
   }
 };
 
@@ -26,7 +29,7 @@ updateRouteInfo();
 const tripEvents = document.querySelector(`.trip-events`);
 renderElement(tripEvents, new SortForm().getElement(), RenderPosition.BEFOREEND);
 
-const tripEventsList = new RoutePoint().getListTemplate();
+const tripEventsList = new EmptyListTemplate().getTemplate();
 renderElement(tripEvents, tripEventsList, RenderPosition.BEFOREEND);
 
 const buttonHandler = (point) => {
@@ -67,21 +70,14 @@ const switchToEdit = (point) => {
     switchToNormal(pointEdit);
   });
 
-  const buttonDelete = pointEdit.querySelector(`.event__reset-btn`);
-  buttonDelete.addEventListener(`click`, () => {
-    points.splice(index, NUMBER_OF_ELEMENTS_TO_REMOVE);
-    route.splice(index, NUMBER_OF_ELEMENTS_TO_REMOVE);
-    pointEdit.remove();
-    updateRouteInfo();
-  });
   route[route.indexOf(point)] = pointEdit;
   tripEventsList.replaceChild(pointEdit, point);
 };
 
 const route = [];
-for (let i = 0; i < points.length; i++) {
-  const newPoint = new RoutePoint(points[i]).getElement();
+points.forEach((point) => {
+  const newPoint = new RoutePoint(point).getElement();
   buttonHandler(newPoint);
   renderElement(tripEventsList, newPoint, RenderPosition.BEFOREEND);
   route.push(newPoint);
-}
+});
