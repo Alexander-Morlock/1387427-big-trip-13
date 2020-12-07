@@ -17,8 +17,8 @@ const updateRouteInfo = () => {
   if (points.length) {
     renderElement(header, new RouteInfo(points).getElement(), RenderPosition.AFTERBEGIN);
   } else {
-    renderElement(header, new EmptyListHeader().getTemplate(), RenderPosition.AFTERBEGIN);
-    tripEvents.append(new EmptyTripEvents().getTemplate());
+    renderElement(header, new EmptyListHeader().getElement(), RenderPosition.AFTERBEGIN);
+    tripEvents.append(new EmptyTripEvents().getElement());
     tripEvents.querySelector(`form`).remove();
     tripEvents.querySelector(`ul`).remove();
   }
@@ -29,7 +29,7 @@ updateRouteInfo();
 const tripEvents = document.querySelector(`.trip-events`);
 renderElement(tripEvents, new SortForm().getElement(), RenderPosition.BEFOREEND);
 
-const tripEventsList = new EmptyListTemplate().getTemplate();
+const tripEventsList = new EmptyListTemplate().getElement();
 renderElement(tripEvents, tripEventsList, RenderPosition.BEFOREEND);
 
 const buttonHandler = (point) => {

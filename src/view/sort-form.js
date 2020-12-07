@@ -1,5 +1,27 @@
 import {createElement} from '../utils.js';
 
+export default class SortForm {
+  constructor() {
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createSortFormTemplate();
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
 const createSortFormTemplate = () => {
   return `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
   <div class="trip-sort__item  trip-sort__item--day">
@@ -28,26 +50,3 @@ const createSortFormTemplate = () => {
   </div>
 </form>`;
 };
-
-export default class SortForm {
-  constructor() {
-    this._element = null;
-  }
-
-  getTemplate() {
-    return createSortFormTemplate();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
-  }
-}
-

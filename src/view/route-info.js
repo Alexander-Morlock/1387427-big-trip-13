@@ -1,5 +1,30 @@
 import dayjs from "dayjs";
 import {createElement} from '../utils.js';
+
+export default class RouteInfo {
+  constructor(points) {
+    this._element = null;
+    this._points = points;
+  }
+
+  getTemplate() {
+    return createRouteInfoTemplate(this._points);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+    this._points = null;
+  }
+}
+
 const createRouteInfoTemplate = (points) => {
 
   const generateRouteTitle = () => {
@@ -65,31 +90,3 @@ const createRouteInfoTemplate = (points) => {
   </div>
 </div>`;
 };
-
-export default class RouteInfo {
-  constructor(points) {
-    this._element = null;
-    this._points = points;
-  }
-
-  getTemplate() {
-    return createRouteInfoTemplate(this._points);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  getEmptyListHeader() {
-    return createElement(this._emptyListHeader);
-  }
-
-  removeElement() {
-    this._element = null;
-    this._points = null;
-  }
-}

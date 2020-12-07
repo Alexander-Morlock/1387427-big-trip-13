@@ -1,6 +1,30 @@
 import dayjs from "dayjs";
 import {createElement} from '../utils.js';
 
+export default class FormEdit {
+  constructor(point) {
+    this._element = null;
+    this._point = point;
+  }
+
+  getTemplate() {
+    return createFormEditTemplate(this._point);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+    this._point = null;
+  }
+}
+
 const createFormEditTemplate = (point) => {
 
   const generateOfferList = () => {
@@ -146,27 +170,3 @@ const createFormEditTemplate = (point) => {
   </form>
 </li>`;
 };
-
-export default class FormEdit {
-  constructor(point) {
-    this._element = null;
-    this._point = point;
-  }
-
-  getTemplate() {
-    return createFormEditTemplate(this._point);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
-    this._point = null;
-  }
-}
