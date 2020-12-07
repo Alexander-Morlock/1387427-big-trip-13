@@ -1,4 +1,30 @@
 import dayjs from "dayjs";
+import {createElement} from '../utils.js';
+
+export default class RouteInfo {
+  constructor(points) {
+    this._element = null;
+    this._points = points;
+  }
+
+  getTemplate() {
+    return createRouteInfoTemplate(this._points);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+    this._points = null;
+  }
+}
+
 const createRouteInfoTemplate = (points) => {
 
   const generateRouteTitle = () => {
@@ -16,7 +42,11 @@ const createRouteInfoTemplate = (points) => {
     }, 0);
   };
 
-  return `<section class="trip-main__trip-info  trip-info">
+  return `<div class="page-body__container  page-header__container">
+  <img class="page-header__logo" src="img/logo.png" width="42" height="42" alt="Trip logo">
+
+  <div class="trip-main">
+  <section class="trip-main__trip-info  trip-info">
     <div class="trip-info__main">
       <h1 class="trip-info__title">${generateRouteTitle()}</h1>
 
@@ -56,7 +86,7 @@ const createRouteInfoTemplate = (points) => {
     </form>
   </div>
 
-  <button class="trip-main__event-add-btn  btn  btn--big  btn--yellow" type="button">New event</button>`;
+  <button class="trip-main__event-add-btn  btn  btn--big  btn--yellow" type="button">New event</button>
+  </div>
+</div>`;
 };
-
-export {createRouteInfoTemplate};
