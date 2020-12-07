@@ -8,7 +8,7 @@ import EmptyTripEvents from './view/empty-trip-events.js';
 import {renderElement, RenderPosition} from "./utils.js";
 import {getGeneratedPoint} from './mock/mockdata.js';
 
-const NUMBER_OF_LIST_ITEMS = 3;
+const NUMBER_OF_LIST_ITEMS = 0;
 const points = new Array(NUMBER_OF_LIST_ITEMS).fill().map(getGeneratedPoint);
 const header = document.querySelector(`.page-header`);
 
@@ -20,14 +20,13 @@ const updateRouteInfo = () => {
     renderElement(header, new EmptyListHeader().getElement(), RenderPosition.AFTERBEGIN);
     tripEvents.append(new EmptyTripEvents().getElement());
     tripEvents.querySelector(`form`).remove();
-    tripEvents.querySelector(`ul`).remove();
   }
 };
 
-updateRouteInfo();
-
 const tripEvents = document.querySelector(`.trip-events`);
 renderElement(tripEvents, new SortForm().getElement(), RenderPosition.BEFOREEND);
+
+updateRouteInfo();
 
 const tripEventsList = new EmptyListTemplate().getElement();
 renderElement(tripEvents, tripEventsList, RenderPosition.BEFOREEND);
