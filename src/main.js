@@ -5,10 +5,10 @@ import SortForm from './view/sort-form.js';
 import EmptyListTemplate from './view/empty-list-template.js';
 import EmptyListHeader from './view/empty-list-header.js';
 import EmptyTripEvents from './view/empty-trip-events.js';
-import {renderElement, RenderPosition} from "./utils.js";
+import {renderElement, RenderPosition} from './utils.js';
 import {getGeneratedPoint} from './mock/mockdata.js';
 
-const NUMBER_OF_LIST_ITEMS = 0;
+const NUMBER_OF_LIST_ITEMS = 3;
 const points = new Array(NUMBER_OF_LIST_ITEMS).fill().map(getGeneratedPoint);
 const header = document.querySelector(`.page-header`);
 
@@ -31,24 +31,19 @@ updateRouteInfo();
 const tripEventsList = new EmptyListTemplate().getElement();
 renderElement(tripEvents, tripEventsList, RenderPosition.BEFOREEND);
 
-const buttonHandler = (point) => {
-  const button = point.querySelector(`.event__rollup-btn`);
-  button.addEventListener(`click`, () => {
-    switchToEdit(point);
-  });
-};
-
 const switchToNormal = (pointEdit) => {
   const index = route.indexOf(pointEdit);
-  const point = new RoutePoint(points[index]).getElement();
-  buttonHandler(point);
-  tripEventsList.replaceChild(point, pointEdit);
+  const point = new RoutePoint(points[index]);
+  point.setEditClickHandler(() => {
+    switchToEdit(point);
+  });
+  tripEventsList.replaceChild(point.getElement(), pointEdit.getElement());
   route[route.indexOf(pointEdit)] = point;
 };
 
 const switchToEdit = (point) => {
   const index = route.indexOf(point);
-  const pointEdit = new FormEdit(points[index]).getElement();
+  const pointEdit = new FormEdit(points[index]);
 
   const onEscapeHandler = (evt) => {
     if (evt.key === `Escape` || evt.key === `Esc`) {
@@ -57,26 +52,25 @@ const switchToEdit = (point) => {
     }
   };
 
-  const buttonMinimize = pointEdit.querySelector(`.event__rollup-btn`);
   document.addEventListener(`keydown`, onEscapeHandler);
-  buttonMinimize.addEventListener(`click`, () => {
+  pointEdit.setMinimizeClickHandler(() => {
     switchToNormal(pointEdit);
   });
 
-  const buttonSave = pointEdit.querySelector(`.event__save-btn`);
-  buttonSave.addEventListener(`click`, (evt) => {
-    evt.preventDefault();
+  pointEdit.setSaveClickHandler(() => {
     switchToNormal(pointEdit);
   });
 
   route[route.indexOf(point)] = pointEdit;
-  tripEventsList.replaceChild(pointEdit, point);
+  tripEventsList.replaceChild(pointEdit.getElement(), point.getElement());
 };
 
 const route = [];
 points.forEach((point) => {
-  const newPoint = new RoutePoint(point).getElement();
-  buttonHandler(newPoint);
-  renderElement(tripEventsList, newPoint, RenderPosition.BEFOREEND);
+  const newPoint = new RoutePoint(point);
+  newPoint.setEditClickHandler(() => {
+    switchToEdit(newPoint);
+  });
+  renderElement(tripEventsList, newPoint.getElement(), RenderPosition.BEFOREEND);
   route.push(newPoint);
 });

@@ -1,22 +1,14 @@
 import dayjs from "dayjs";
-import {createElement} from '../utils.js';
+import AbstractView from "./abstract.js";
 
-export default class RouteInfo {
+export default class RouteInfo extends AbstractView {
   constructor(points) {
-    this._element = null;
+    super();
     this._points = points;
   }
 
   getTemplate() {
     return createRouteInfoTemplate(this._points);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
   }
 
   removeElement() {

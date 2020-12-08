@@ -1,22 +1,30 @@
 import dayjs from "dayjs";
-import {createElement} from '../utils.js';
+import AbstractView from "./abstract.js";
 
-export default class FormEdit {
+export default class FormEdit extends AbstractView {
   constructor(point) {
-    this._element = null;
+    super();
     this._point = point;
+    this._clickHandler = this._clickHandler.bind(this);
   }
 
   getTemplate() {
     return createFormEditTemplate(this._point);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
+  _clickHandler(evt) {
+    evt.preventDefault();
+    this._callback.click();
+  }
 
-    return this._element;
+  setSaveClickHandler(callback) {
+    this._callback.click = callback;
+    this.getElement().querySelector(`.event__save-btn`).addEventListener(`click`, this._clickHandler);
+  }
+
+  setMinimizeClickHandler(callback) {
+    this._callback.click = callback;
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._clickHandler);
   }
 
   removeElement() {

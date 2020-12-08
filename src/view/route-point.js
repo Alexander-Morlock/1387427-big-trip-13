@@ -1,22 +1,26 @@
 import dayjs from "dayjs";
-import {createElement} from '../utils.js';
+import {getDuration} from '../utils.js';
+import AbstractView from "./abstract.js";
 
-export default class RoutePoint {
+export default class RoutePoint extends AbstractView {
   constructor(point) {
-    this._element = null;
+    super();
     this._point = point;
+    this._clickHandler = this._clickHandler.bind(this);
   }
 
   getTemplate() {
     return createTripEventsListItemTemplate(this._point);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
+  _clickHandler(evt) {
+    evt.preventDefault();
+    this._callback.click();
+  }
 
-    return this._element;
+  setEditClickHandler(callback) {
+    this._callback.click = callback;
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._clickHandler);
   }
 
   removeElement() {
@@ -24,37 +28,6 @@ export default class RoutePoint {
     this._point = null;
   }
 }
-
-const getDuration = (timeStart, timeEnd) => {
-  const start = new Date(timeStart).getTime();
-  const end = new Date(timeEnd).getTime();
-  const durationMinutes = Math.floor(Math.abs(end - start) / 60000); // in minutes
-  const days = Math.floor(durationMinutes / 60 / 24);
-  const hours = Math.floor((durationMinutes - days * 24 * 60) / 60);
-  const minutes = durationMinutes - days * 24 * 60 - hours * 60;
-  let duration = ``;
-
-  if (days) {
-    if (days < 10) {
-      duration += `0`;
-    }
-    duration += days + `D `;
-  }
-
-  if (days || hours) {
-    if (hours < 10) {
-      duration += `0`;
-    }
-    duration += hours + `H `;
-  }
-
-  if (minutes < 10) {
-    duration += `0`;
-  }
-  duration += minutes + `M`;
-
-  return duration;
-};
 
 const createTripEventsListItemTemplate = ({
   destination,

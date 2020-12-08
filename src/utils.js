@@ -24,3 +24,34 @@ export const createElement = (template) => {
 
   return newElement.firstChild;
 };
+
+export const getDuration = (timeStart, timeEnd) => {
+  const start = new Date(timeStart).getTime();
+  const end = new Date(timeEnd).getTime();
+  const durationMinutes = Math.floor(Math.abs(end - start) / 60000); // in minutes
+  const days = Math.floor(durationMinutes / 60 / 24);
+  const hours = Math.floor((durationMinutes - days * 24 * 60) / 60);
+  const minutes = durationMinutes - days * 24 * 60 - hours * 60;
+  let duration = ``;
+
+  if (days) {
+    if (days < 10) {
+      duration += `0`;
+    }
+    duration += days + `D `;
+  }
+
+  if (days || hours) {
+    if (hours < 10) {
+      duration += `0`;
+    }
+    duration += hours + `H `;
+  }
+
+  if (minutes < 10) {
+    duration += `0`;
+  }
+  duration += minutes + `M`;
+
+  return duration;
+};
