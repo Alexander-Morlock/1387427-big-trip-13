@@ -6,12 +6,12 @@ export default class RoutePoint extends AbstractView {
   constructor(point) {
     super();
     this._point = point;
-    this._destination = {point};
-    this._tripType = {point};
-    this._time = {point};
-    this._offers = {point};
-    this._isFavorite = {point};
-    this._price = {point};
+    this._destination = point.destination;
+    this._tripType = point.tripType;
+    this._time = point.time;
+    this._offers = point.offers;
+    this._isFavorite = point.isFavorite;
+    this._price = point.price;
     this._clickHandler = this._clickHandler.bind(this);
   }
 
