@@ -6,11 +6,72 @@ export default class RoutePoint extends AbstractView {
   constructor(point) {
     super();
     this._point = point;
+    this._destination = {point};
+    this._tripType = {point};
+    this._time = {point};
+    this._offers = {point};
+    this._isFavorite = {point};
+    this._price = {point};
     this._clickHandler = this._clickHandler.bind(this);
   }
 
+  _generateOfferList() {
+    let markup = ``;
+    if (!this._offers) {
+      markup += `<li class="event__offer"></li>`;
+    } else {
+      for (let i = 0; i < this._offers.length; i++) {
+        markup += `<li class="event__offer">
+        <span class="event__offer-title">` + this._offers[i].title + `</span>
+        &plus;&euro;&nbsp;
+        <span class="event__offer-price">` + this._offers[i].price + `</span>
+        </li>`;
+      }
+    }
+
+    return markup;
+  }
+
+  _addCssClassIsFavorite() {
+    return this._isFavorite
+      ? ` event__favorite-btn--active`
+      : ``;
+  }
+
   getTemplate() {
-    return createTripEventsListItemTemplate(this._point);
+    return `<li class="trip-events__item">
+  <div class="event">
+    <time class="event__date" datetime="${dayjs(this._time.start).format(`YYYY-MM-DD`)}">${dayjs(this._time.start).format(`MMM DD`)}</time>
+    <div class="event__type">
+      <img class="event__type-icon" width="42" height="42" src="img/icons/${this._tripType}.png" alt="Event type icon">
+    </div>
+    <h3 class="event__title">${this._tripType} ${this._destination.title}</h3>
+    <div class="event__schedule">
+      <p class="event__time">
+        <time class="event__start-time" datetime="${this._time.start}">${dayjs(this._time.start).format(`hh:mm`)}</time>
+        &mdash;
+        <time class="event__end-time" datetime="${this._time.end}">${dayjs(this._time.end).format(`hh:mm`)}</time>
+      </p>
+      <p class="event__durationMinutes">${getDuration(this._time.start, this._time.end)}</p>
+    </div>
+    <p class="event__price">
+      &euro;&nbsp;<span class="event__price-value">${this._price}</span>
+    </p>
+    <h4 class="visually-hidden">Offers:</h4>
+    <ul class="event__selected-offers">
+      ${this._generateOfferList()}
+    </ul>
+    <button class="event__favorite-btn${this._addCssClassIsFavorite()}" type="button">
+      <span class="visually-hidden">Add to favorite</span>
+      <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
+        <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
+      </svg>
+    </button>
+    <button class="event__rollup-btn" type="button">
+      <span class="visually-hidden">Open event</span>
+    </button>
+  </div>
+</li>`;
   }
 
   _clickHandler(evt) {
@@ -28,70 +89,3 @@ export default class RoutePoint extends AbstractView {
     this._point = null;
   }
 }
-
-const createTripEventsListItemTemplate = ({
-  destination,
-  tripType,
-  time,
-  offers,
-  isFavorite,
-  price
-}) => {
-
-  const generateOfferList = () => {
-    let markup = ``;
-    if (!offers) {
-      markup += `<li class="event__offer"></li>`;
-    } else {
-      for (let i = 0; i < offers.length; i++) {
-        markup += `<li class="event__offer">
-        <span class="event__offer-title">` + offers[i].title + `</span>
-        &plus;&euro;&nbsp;
-        <span class="event__offer-price">` + offers[i].price + `</span>
-        </li>`;
-      }
-    }
-
-    return markup;
-  };
-
-  const addCssClassIsFavorite = () => {
-    return isFavorite
-      ? ` event__favorite-btn--active`
-      : ``;
-  };
-
-  return `<li class="trip-events__item">
-  <div class="event">
-    <time class="event__date" datetime="${dayjs(time.start).format(`YYYY-MM-DD`)}">${dayjs(time.start).format(`MMM DD`)}</time>
-    <div class="event__type">
-      <img class="event__type-icon" width="42" height="42" src="img/icons/${tripType}.png" alt="Event type icon">
-    </div>
-    <h3 class="event__title">${tripType} ${destination.title}</h3>
-    <div class="event__schedule">
-      <p class="event__time">
-        <time class="event__start-time" datetime="${time.start}">${dayjs(time.start).format(`hh:mm`)}</time>
-        &mdash;
-        <time class="event__end-time" datetime="${time.end}">${dayjs(time.end).format(`hh:mm`)}</time>
-      </p>
-      <p class="event__durationMinutes">${getDuration(time.start, time.end)}</p>
-    </div>
-    <p class="event__price">
-      &euro;&nbsp;<span class="event__price-value">${price}</span>
-    </p>
-    <h4 class="visually-hidden">Offers:</h4>
-    <ul class="event__selected-offers">
-      ${generateOfferList()}
-    </ul>
-    <button class="event__favorite-btn${addCssClassIsFavorite()}" type="button">
-      <span class="visually-hidden">Add to favorite</span>
-      <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
-        <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
-      </svg>
-    </button>
-    <button class="event__rollup-btn" type="button">
-      <span class="visually-hidden">Open event</span>
-    </button>
-  </div>
-</li>`;
-};
