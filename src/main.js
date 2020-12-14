@@ -10,4 +10,4 @@ const tripEvents = document.querySelector(`.trip-events`);
 renderElement(tripEvents, new SortForm().getElement(), RenderPosition.BEFOREEND);
 
 const presenter = new TripPresenter(points, header, tripEvents);
-presenter.updateRouteInfo();
+presenter.renderPoints();
