@@ -7,9 +7,9 @@ export default class Observer {
     this._subscribers.push(callback);
   }
 
-  emit(evt) {
+  emit(index) {
     this._subscribers.forEach((callback) => {
-      callback(evt);
+      callback(index);
     });
   }
 }

@@ -19,9 +19,9 @@ export default class TripPoint {
     this._point = newPoint;
   }
 
-  clickHandler(index, newPoint) {
+  clickHandler(index, point) {
     if (index === this._index) {
-      this.switchToEdit(newPoint);
+      this.switchToEdit(point);
     } else {
       this.switchToNormal();
     }
