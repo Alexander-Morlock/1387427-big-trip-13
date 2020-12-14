@@ -10,7 +10,6 @@ export default class TripPoint {
     this._point = null;
     this._editPoint = null;
     this._observer = observer;
-    this._opened = false;
   }
 
   toggleFavorite() {
@@ -47,7 +46,6 @@ export default class TripPoint {
   }
 
   switchToEdit(point) {
-    this._opened = true;
     this._editPoint = new FormEdit(this._pointData);
     replace(this._editPoint.getElement(), point.getElement());
 
@@ -71,9 +69,9 @@ export default class TripPoint {
   }
 
   switchToNormal() {
-    if (this._opened) {
+    if (this._editPoint) {
       replace(this._point.getElement(), this._editPoint.getElement());
-      this._opened = false;
+      this._editPoint = null;
     }
   }
 }
