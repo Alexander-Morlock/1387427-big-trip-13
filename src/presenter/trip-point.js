@@ -3,12 +3,14 @@ import RoutePoint from '../view/route-point.js';
 import {replace} from '../utils.js';
 
 export default class TripPoint {
-  constructor(index, pointDatabase) {
+  constructor(index, pointDatabase, observer) {
     this._pointDatabase = pointDatabase;
     this._pointData = this._pointDatabase[index];
     this._index = index;
     this._point = null;
     this._editPoint = null;
+    this._observer = observer;
+    this._opened = false;
   }
 
   toggleFavorite() {
@@ -18,17 +20,26 @@ export default class TripPoint {
     this._point = newPoint;
   }
 
-  createNewPoint(flag) {
-    const newPoint = new RoutePoint(this._pointData);
-    newPoint.setEditClickHandler(() => {
+  clickHandler(index, newPoint) {
+    if (index === this._index) {
       this.switchToEdit(newPoint);
+    } else {
+      this.switchToNormal();
+    }
+  }
+
+  createNewPoint(initFlag) {
+    const newPoint = new RoutePoint(this._pointData);
+    this._observer.subscribe((index) => this.clickHandler(index, newPoint));
+    newPoint.setEditClickHandler(() => {
+      this._observer.emit(this._index);
     });
 
     newPoint.setFavoriteButtonHandler(() => {
       this.toggleFavorite();
     });
 
-    if (flag) {
+    if (initFlag) {
       this._point = newPoint;
     }
 
@@ -36,6 +47,7 @@ export default class TripPoint {
   }
 
   switchToEdit(point) {
+    this._opened = true;
     this._editPoint = new FormEdit(this._pointData);
     replace(this._editPoint.getElement(), point.getElement());
 
@@ -59,6 +71,9 @@ export default class TripPoint {
   }
 
   switchToNormal() {
-    replace(this._point.getElement(), this._editPoint.getElement());
+    if (this._opened) {
+      replace(this._point.getElement(), this._editPoint.getElement());
+      this._opened = false;
+    }
   }
 }

@@ -3,6 +3,7 @@ import EmptyListHeader from '../view/empty-list-header.js';
 import EmptyTripEvents from '../view/empty-trip-events.js';
 import EmptyListTemplate from '../view/empty-list-template.js';
 import TripPoint from './trip-point.js';
+import Observer from './observer.js';
 import {renderElement, RenderPosition} from '../utils.js';
 
 export default class Trip {
@@ -11,6 +12,7 @@ export default class Trip {
     this._headerContainer = headerContainer;
     this._pointsData = pointsData;
     this._tripEventsList = new EmptyListTemplate().getElement();
+    this._observer = new Observer();
   }
 
   updateRouteInfo() {
@@ -28,7 +30,7 @@ export default class Trip {
   renderPoints() {
     renderElement(this._tripEventsContainer, this._tripEventsList, RenderPosition.BEFOREEND);
     this._pointsData.forEach((point, index) => {
-      const newPoint = new TripPoint(index, this._pointsData).createNewPoint(`initialization`);
+      const newPoint = new TripPoint(index, this._pointsData, this._observer).createNewPoint(`initialization`);
       renderElement(this._tripEventsList, newPoint.getElement(), RenderPosition.BEFOREEND);
     });
 
