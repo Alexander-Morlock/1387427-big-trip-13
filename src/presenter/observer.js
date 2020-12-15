@@ -4,7 +4,7 @@ export default class Observer {
   }
 
   subscribe(index, callback) {
-    this._subscribers[index] = (callback);
+    this._subscribers[index] = callback;
   }
 
   emit(index) {

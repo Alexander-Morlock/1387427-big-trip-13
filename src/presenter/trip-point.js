@@ -6,10 +6,10 @@ export default class TripPoint {
   constructor(index, pointDatabase, observer) {
     this._pointDatabase = pointDatabase;
     this._pointData = this._pointDatabase[index];
+    this._observer = observer;
     this._index = index;
     this._point = null;
     this._editPoint = null;
-    this._observer = observer;
   }
 
   toggleFavorite() {
@@ -31,7 +31,7 @@ export default class TripPoint {
     const newPoint = new RoutePoint(this._pointData);
     newPoint.setFavoriteButtonHandler(() => this.toggleFavorite());
 
-    this._observer.subscribe(this._index, (index) => this.observerClickHandler(index, newPoint));
+    this._observer.subscribe(this._index, (index) => this.observerClickHandler(index));
     newPoint.setEditClickHandler(() => this._observer.emit(this._index));
 
     if (initFlag) {
