@@ -12,15 +12,16 @@ export default class FormEdit extends AbstractView {
     if (!this._point.offers) {
       return ``;
     } else {
-      return this._point.offers.map((offer, index) => `<div class="event__available-offers">
-    <div class="event__offer-selector">
+      return `<div class="event__available-offers">`
+      + this._point.offers.map((offer, index) => {
+        return `<div class="event__offer-selector">
       <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-${index + 1}" type="checkbox" name="event-offer-${offer.type}">
       <label class="event__offer-label" for="event-offer-${offer.type}-${index + 1}">
         <span class="event__offer-title">${offer.title} </span>&plus;&euro;&nbsp;
         <span class="event__offer-price">${offer.price}</span>
       </label>
-    </div>`
-      );
+    </div>`;
+      }).join(``);
     }
   }
 
