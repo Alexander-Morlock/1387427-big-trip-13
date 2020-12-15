@@ -1,15 +1,13 @@
 export default class Observer {
   constructor() {
-    this._subscribers = [];
+    this._subscribers = {};
   }
 
-  subscribe(callback) {
-    this._subscribers.push(callback);
+  subscribe(index, callback) {
+    this._subscribers[index] = (callback);
   }
 
   emit(index) {
-    this._subscribers.forEach((callback) => {
-      callback(index);
-    });
+    Object.keys(this._subscribers).forEach((key) => this._subscribers[key](index));
   }
 }

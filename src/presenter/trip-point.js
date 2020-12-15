@@ -19,9 +19,9 @@ export default class TripPoint {
     this._point = newPoint;
   }
 
-  clickHandler(index, point) {
+  observerClickHandler(index) {
     if (index === this._index) {
-      this.switchToEdit(point);
+      this.switchToEdit(this._point);
     } else {
       this.switchToNormal();
     }
@@ -29,14 +29,10 @@ export default class TripPoint {
 
   createNewPoint(initFlag) {
     const newPoint = new RoutePoint(this._pointData);
-    this._observer.subscribe((index) => this.clickHandler(index, newPoint));
-    newPoint.setEditClickHandler(() => {
-      this._observer.emit(this._index);
-    });
+    newPoint.setFavoriteButtonHandler(() => this.toggleFavorite());
 
-    newPoint.setFavoriteButtonHandler(() => {
-      this.toggleFavorite();
-    });
+    this._observer.subscribe(this._index, (index) => this.observerClickHandler(index, newPoint));
+    newPoint.setEditClickHandler(() => this._observer.emit(this._index));
 
     if (initFlag) {
       this._point = newPoint;
