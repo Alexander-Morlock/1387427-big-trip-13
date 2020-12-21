@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import {getDuration} from '../utils.js';
+import {getDuration} from '../utils/render.js';
 import AbstractView from "./abstract.js";
 
 export default class RoutePoint extends AbstractView {
@@ -90,7 +90,7 @@ export default class RoutePoint extends AbstractView {
     this._callback.clickFavorite();
   }
 
-  setFavoriteButtonHandler(callback) {
+  setFavoriteClickHandler(callback) {
     this._callback.clickFavorite = callback;
     this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, this._clickFavoriteHandler);
   }

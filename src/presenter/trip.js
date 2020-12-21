@@ -1,39 +1,47 @@
-import RouteInfo from '../view/route-info.js';
-import EmptyListHeader from '../view/empty-list-header.js';
-import EmptyTripEvents from '../view/empty-trip-events.js';
+import SortFormView from '../view/sort-form.js';
 import EmptyListTemplate from '../view/empty-list-template.js';
-import TripPoint from './trip-point.js';
-import Observer from './observer.js';
-import {renderElement, RenderPosition} from '../utils.js';
+import TripPointPresenter from './trip-point.js';
+import {render, RenderPosition} from '../utils/render.js';
+import {updateItem} from "../utils/common.js";
 
 export default class Trip {
-  constructor(pointsData, headerContainer, tripEventsContainer) {
-    this._tripEventsContainer = tripEventsContainer;
-    this._headerContainer = headerContainer;
-    this._pointsData = pointsData;
+  constructor(mainContainer, updateRouteInfo) {
+    this._mainContainer = mainContainer;
     this._tripEventsList = new EmptyListTemplate().getElement();
-    this._observer = new Observer();
+    this._sortFormComponent = new SortFormView().getElement();
+    this._updateRouteInfo = updateRouteInfo;
+    this._tripPresenter = {};
+    this._handlePointChange = this._handlePointChange.bind(this);
+    this._handleModeChange = this._handleModeChange.bind(this);
   }
 
-  updateRouteInfo() {
-    if (this._pointsData.length) {
-      renderElement(this._headerContainer, new RouteInfo(this._pointsData).getElement(),
-          RenderPosition.AFTERBEGIN);
-    } else {
-      renderElement(this._headerContainer, new EmptyListHeader().getElement(),
-          RenderPosition.AFTERBEGIN);
-      this._tripEventsContainer.append(new EmptyTripEvents().getElement());
-      this._tripEventsContainer.querySelector(`form`).remove();
-    }
+  init(points) {
+    this._points = points.slice();
+    // this._pointsSorted = points.slice();
+    render(this._mainContainer, this._sortFormComponent, RenderPosition.BEFOREEND);
+    render(this._mainContainer, this._tripEventsList, RenderPosition.BEFOREEND);
+    this._updateRouteInfo();
+    this._renderPoints();
   }
 
-  renderPoints() {
-    renderElement(this._tripEventsContainer, this._tripEventsList, RenderPosition.BEFOREEND);
-    this._pointsData.forEach((point, index) => {
-      const newPoint = new TripPoint(index, this._pointsData, this._observer).createNewPoint(`initialization`);
-      renderElement(this._tripEventsList, newPoint.getElement(), RenderPosition.BEFOREEND);
-    });
+  _renderPoints() {
+    this._points.forEach((point) => this._renderPoint(point));
+  }
 
-    this.updateRouteInfo();
+  _renderPoint(point) {
+    const pointPresenter = new TripPointPresenter(this._tripEventsList, this._handlePointChange, this._handleModeChange);
+    pointPresenter.init(point);
+    this._tripPresenter[point.id] = pointPresenter;
+  }
+
+  _handleModeChange() {
+    Object
+      .values(this._tripPresenter)
+      .forEach((presenter) => presenter.resetView());
+  }
+
+  _handlePointChange(updatedPoint) {
+    this._points = updateItem(this._points, updatedPoint);
+    this._tripPresenter[updatedPoint.id].init(updatedPoint);
   }
 }

@@ -5,7 +5,8 @@ export default class FormEdit extends AbstractView {
   constructor(point) {
     super();
     this._point = point;
-    this._clickHandler = this._clickHandler.bind(this);
+    this._clickSubmitHandler = this._clickSubmitHandler.bind(this);
+    this._clickMinimizeHandler = this._clickMinimizeHandler.bind(this);
   }
 
   _generateOfferList() {
@@ -152,19 +153,25 @@ export default class FormEdit extends AbstractView {
   </li>`;
   }
 
-  _clickHandler(evt) {
+  _clickSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.click();
+    this._callback.submit();
   }
 
-  setSaveClickHandler(callback) {
-    this._callback.click = callback;
-    this.getElement().querySelector(`.event__save-btn`).addEventListener(`click`, this._clickHandler);
+  _clickMinimizeHandler(evt) {
+    evt.preventDefault();
+    this._callback.minimize();
+  }
+
+
+  setEditSubmitHandler(callback) {
+    this._callback.submit = callback;
+    this.getElement().querySelector(`.event__save-btn`).addEventListener(`click`, this._clickSubmitHandler);
   }
 
   setMinimizeClickHandler(callback) {
-    this._callback.click = callback;
-    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._clickHandler);
+    this._callback.minimize = callback;
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._clickMinimizeHandler);
   }
 
   removeElement() {
