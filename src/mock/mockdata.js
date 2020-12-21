@@ -3,6 +3,8 @@ import dayjs from "dayjs";
 const MIN_NUMBER_OF_PHOTOS = 3;
 const MAX_NUMBER_OF_PHOTOS = 5;
 
+const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
+
 const randomInt = (a = 0, b = 1) => {
   const lower = Math.ceil(Math.min(a, b));
   const upper = Math.floor(Math.max(a, b));
@@ -126,6 +128,7 @@ const generateIsFavorite = () => Boolean(randomInt(0, 1));
 
 export const getGeneratedPoint = () => {
   return {
+    id: generateId(),
     destination: generateDestination(),
     stopType: generateStopType(),
     tripType: generateTripType(),

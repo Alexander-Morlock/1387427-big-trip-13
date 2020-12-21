@@ -5,22 +5,24 @@ export default class FormEdit extends AbstractView {
   constructor(point) {
     super();
     this._point = point;
-    this._clickHandler = this._clickHandler.bind(this);
+    this._clickSubmitHandler = this._clickSubmitHandler.bind(this);
+    this._clickMinimizeHandler = this._clickMinimizeHandler.bind(this);
   }
 
   _generateOfferList() {
     if (!this._point.offers) {
       return ``;
     } else {
-      return this._point.offers.map((offer, index) => `<div class="event__available-offers">
-    <div class="event__offer-selector">
+      return `<div class="event__available-offers">`
+      + this._point.offers.map((offer, index) => {
+        return `<div class="event__offer-selector">
       <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-${index + 1}" type="checkbox" name="event-offer-${offer.type}">
       <label class="event__offer-label" for="event-offer-${offer.type}-${index + 1}">
         <span class="event__offer-title">${offer.title} </span>&plus;&euro;&nbsp;
         <span class="event__offer-price">${offer.price}</span>
       </label>
-    </div>`
-      );
+    </div>`;
+      }).join(``);
     }
   }
 
@@ -151,19 +153,25 @@ export default class FormEdit extends AbstractView {
   </li>`;
   }
 
-  _clickHandler(evt) {
+  _clickSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.click();
+    this._callback.submit();
   }
 
-  setSaveClickHandler(callback) {
-    this._callback.click = callback;
-    this.getElement().querySelector(`.event__save-btn`).addEventListener(`click`, this._clickHandler);
+  _clickMinimizeHandler(evt) {
+    evt.preventDefault();
+    this._callback.minimize();
+  }
+
+
+  setEditSubmitHandler(callback) {
+    this._callback.submit = callback;
+    this.getElement().querySelector(`.event__save-btn`).addEventListener(`click`, this._clickSubmitHandler);
   }
 
   setMinimizeClickHandler(callback) {
-    this._callback.click = callback;
-    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._clickHandler);
+    this._callback.minimize = callback;
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._clickMinimizeHandler);
   }
 
   removeElement() {

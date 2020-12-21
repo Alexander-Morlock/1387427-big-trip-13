@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import {getDuration} from '../utils.js';
+import {getDuration} from '../utils/render.js';
 import AbstractView from "./abstract.js";
 
 export default class RoutePoint extends AbstractView {
@@ -13,6 +13,7 @@ export default class RoutePoint extends AbstractView {
     this._isFavorite = point.isFavorite;
     this._price = point.price;
     this._clickHandler = this._clickHandler.bind(this);
+    this._clickFavoriteHandler = this._clickFavoriteHandler.bind(this);
   }
 
   _generateOfferList() {
@@ -22,9 +23,9 @@ export default class RoutePoint extends AbstractView {
     } else {
       for (let i = 0; i < this._offers.length; i++) {
         markup += `<li class="event__offer">
-        <span class="event__offer-title">` + this._offers[i].title + `</span>
+        <span class="event__offer-title">${this._offers[i].title}</span>
         &plus;&euro;&nbsp;
-        <span class="event__offer-price">` + this._offers[i].price + `</span>
+        <span class="event__offer-price">${this._offers[i].price}</span>
         </li>`;
       }
     }
@@ -82,6 +83,16 @@ export default class RoutePoint extends AbstractView {
   setEditClickHandler(callback) {
     this._callback.click = callback;
     this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._clickHandler);
+  }
+
+  _clickFavoriteHandler(evt) {
+    evt.preventDefault();
+    this._callback.clickFavorite();
+  }
+
+  setFavoriteClickHandler(callback) {
+    this._callback.clickFavorite = callback;
+    this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, this._clickFavoriteHandler);
   }
 
   removeElement() {
