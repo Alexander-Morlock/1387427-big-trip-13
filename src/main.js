@@ -6,15 +6,18 @@ import {getGeneratedPoint} from './mock/mockdata.js';
 import {render, RenderPosition} from './utils/render.js';
 
 const NUMBER_OF_LIST_ITEMS = 3;
-const points = new Array(NUMBER_OF_LIST_ITEMS).fill().map(getGeneratedPoint);
+const pointsData = new Array(NUMBER_OF_LIST_ITEMS).fill().map(getGeneratedPoint);
 
 const headerContainer = document.querySelector(`.page-header`);
 const tripEventsContainer = document.querySelector(`.trip-events`);
 const noPointsHeaderComponent = new EmptyListHeaderView().getElement();
 const noPointsComponent = new NoPointsView().getElement();
 
-const updateRouteInfo = () => {
+const updateRouteInfo = (points) => {
   if (points.length) {
+    if (headerContainer.children[0]) {
+      headerContainer.children[0].remove();
+    }
     render(headerContainer, new RouteInfoView(points).getElement(), RenderPosition.AFTERBEGIN);
   } else {
     render(headerContainer, noPointsHeaderComponent, RenderPosition.AFTERBEGIN);
@@ -24,5 +27,5 @@ const updateRouteInfo = () => {
 };
 
 const presenter = new TripPresenter(tripEventsContainer, updateRouteInfo);
-presenter.init(points);
+presenter.init(pointsData);
 
