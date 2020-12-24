@@ -47,19 +47,16 @@ export default class Trip {
   _sortPointList(sortType) {
     switch (sortType) {
       case `sort-time`: {
-        // sort by time
-        this._points.sort((a, b) => this._getDurationOfTrip(a) - this._getDurationOfTrip(b));
+        this._points.sort((a, b) => this._getDurationOfTrip(b) - this._getDurationOfTrip(a));
         this._reRenderPointList();
         break;
       }
       case `sort-price`: {
-        // sort by price
-        this._points.sort((a, b) => a.price - b.price);
+        this._points.sort((a, b) => b.price - a.price);
         this._reRenderPointList();
         break;
       }
       default: {
-        // sort by days is default
         this._points = this._pointsBeforeSort.slice();
         this._reRenderPointList();
       }

@@ -7,11 +7,8 @@ import {render, RenderPosition} from './utils/render.js';
 
 const NUMBER_OF_LIST_ITEMS = 3;
 const pointsData = new Array(NUMBER_OF_LIST_ITEMS).fill().map(getGeneratedPoint);
-
 const headerContainer = document.querySelector(`.page-header`);
 const tripEventsContainer = document.querySelector(`.trip-events`);
-const noPointsHeaderComponent = new EmptyListHeaderView().getElement();
-const noPointsComponent = new NoPointsView().getElement();
 
 const updateRouteInfo = (points) => {
   if (points.length) {
@@ -20,8 +17,8 @@ const updateRouteInfo = (points) => {
     }
     render(headerContainer, new RouteInfoView(points).getElement(), RenderPosition.AFTERBEGIN);
   } else {
-    render(headerContainer, noPointsHeaderComponent, RenderPosition.AFTERBEGIN);
-    tripEventsContainer.append(noPointsComponent);
+    render(headerContainer, new EmptyListHeaderView().getElement(), RenderPosition.AFTERBEGIN);
+    tripEventsContainer.append(new NoPointsView().getElement());
     tripEventsContainer.querySelector(`form`).remove();
   }
 };
