@@ -11,7 +11,7 @@ export default class Trip {
     this._tripEventsList = new EmptyListTemplate();
     this._sortComponent = new SortFormView();
     this._updateRouteInfo = updateRouteInfo;
-    this._tripPresenter = {};
+    this._tripPresenters = {};
     this._handlePointChange = this._handlePointChange.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleChangeSortMode = this._handleChangeSortMode.bind(this);
@@ -31,13 +31,15 @@ export default class Trip {
     this._sortPointList(evt.target.value);
   }
 
-  _reRenderPointList() {
+  _handleModeChange() {
     Object
-      .values(this._tripPresenter)
-      .forEach((presenter) => presenter.destroy());
-    this._tripPresenter = {};
-    this._renderPoints();
-    this._updateRouteInfo(this._points);
+      .values(this._tripPresenters)
+      .forEach((presenter) => presenter.resetView());
+  }
+
+  _handlePointChange(updatedPoint) {
+    this._points = updateItem(this._points, updatedPoint);
+    this._tripPresenters[updatedPoint.id].init(updatedPoint);
   }
 
   _getDurationOfTrip(point) {
@@ -63,6 +65,15 @@ export default class Trip {
     }
   }
 
+  _reRenderPointList() {
+    Object
+      .values(this._tripPresenters)
+      .forEach((presenter) => presenter.destroy());
+    this._tripPresenters = {};
+    this._renderPoints();
+    this._updateRouteInfo(this._points);
+  }
+
   _renderSort() {
     render(this._mainContainer, this._sortComponent.getElement(), RenderPosition.BEFOREEND);
     this._sortComponent.setChangeSortModeHandler(this._handleChangeSortMode);
@@ -75,17 +86,6 @@ export default class Trip {
   _renderPoint(point) {
     const pointPresenter = new TripPointPresenter(this._tripEventsList, this._handlePointChange, this._handleModeChange);
     pointPresenter.init(point);
-    this._tripPresenter[point.id] = pointPresenter;
-  }
-
-  _handleModeChange() {
-    Object
-      .values(this._tripPresenter)
-      .forEach((presenter) => presenter.resetView());
-  }
-
-  _handlePointChange(updatedPoint) {
-    this._points = updateItem(this._points, updatedPoint);
-    this._tripPresenter[updatedPoint.id].init(updatedPoint);
+    this._tripPresenters[point.id] = pointPresenter;
   }
 }
