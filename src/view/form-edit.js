@@ -1,20 +1,82 @@
 import dayjs from "dayjs";
-import AbstractView from "./abstract.js";
+import SmartView from "./smart.js";
+import flatpickr from "flatpickr";
+import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
-export default class FormEdit extends AbstractView {
+export default class FormEdit extends SmartView {
   constructor(point) {
     super();
-    this._point = point;
+    this._data = FormEdit.parsePointToData(point);
+    this._datePeakerStart = null;
+    this._datePeakerEnd = null;
     this._clickSubmitHandler = this._clickSubmitHandler.bind(this);
     this._clickMinimizeHandler = this._clickMinimizeHandler.bind(this);
+    this._startDateChangeHandler = this._startDateChangeHandler.bind(this);
+    this._endDateChangeHandler = this._endDateChangeHandler.bind(this);
+    this._setInnerHandlers();
+    this._setDatepickers();
+  }
+
+  _setDatepickers() {
+    if (this._datePeakerStart) {
+      this._datePeakerStart.destroy();
+      this._datePeakerStart = null;
+      this._datePeakerEnd.destroy();
+      this._datePeakerEnd = null;
+    }
+
+    this._datePeakerStart = flatpickr(
+        this.getElement().querySelector(`#event-start-time-1`),
+        {
+          dateFormat: `d/m/y H:i`,
+          defaultDate: dayjs(this._data.time.start).format(`DD/MM/YY hh:mm`),
+          onChange: this._startDateChangeHandler
+        }
+    );
+    this._datePeakerEnd = flatpickr(
+        this.getElement().querySelector(`#event-end-time-1`),
+        {
+          dateFormat: `d/m/y H:i`,
+          defaultDate: dayjs(this._data.time.end).format(`DD/MM/YY hh:mm`),
+          onChange: this._endDateChangeHandler
+        }
+    );
+  }
+
+  _startDateChangeHandler() {
+    const newStartDate = dayjs(
+        this.getElement().querySelector(`#event-start-time-1`).value
+    ).format(`YYYY-MM-DDThh:mm`);
+    const endDate = this._data.time.end;
+    this.updateData(
+        {
+          time: {
+            start: newStartDate,
+            end: endDate
+          }
+        });
+  }
+
+  _endDateChangeHandler() {
+    const newEndDate = dayjs(
+        this.getElement().querySelector(`#event-end-time-1`).value
+    ).format(`YYYY-MM-DDThh:mm`);
+    const startDate = this._data.time.start;
+    this.updateData(
+        {
+          time: {
+            start: startDate,
+            end: newEndDate
+          }
+        });
   }
 
   _generateOfferList() {
-    if (!this._point.offers) {
+    if (!this._data.offers) {
       return ``;
     } else {
       return `<div class="event__available-offers">`
-      + this._point.offers.map((offer, index) => {
+      + this._data.offers.map((offer, index) => {
         return `<div class="event__offer-selector">
       <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-${index + 1}" type="checkbox" name="event-offer-${offer.type}">
       <label class="event__offer-label" for="event-offer-${offer.type}-${index + 1}">
@@ -27,9 +89,17 @@ export default class FormEdit extends AbstractView {
   }
 
   _generatePhotos() {
-    return this._point.destination.photoUrl.map((photo) => {
+    return this._data.destination.photoUrl.map((photo) => {
       return `<img class="event__photo" src="${photo}" alt="Event photo">`;
     }).join(``);
+  }
+
+  _generateDataList() {
+    return `<datalist id="destination-list-1">
+    ${this._data.destinations.reduce((acc, destination) => {
+    return acc + `<option value="` + destination.title + `"></option>`;
+  }, ``)}
+    </datalist>`;
   }
 
   getTemplate() {
@@ -39,7 +109,7 @@ export default class FormEdit extends AbstractView {
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
             <span class="visually-hidden">Choose event type</span>
-            <img class="event__type-icon" width="17" height="17" src="img/icons/${this._point.tripType}.png" alt="Event type icon">
+            <img class="event__type-icon" width="17" height="17" src="img/icons/${this._data.tripType}.png" alt="Event type icon">
           </label>
           <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -102,22 +172,18 @@ export default class FormEdit extends AbstractView {
 
         <div class="event__field-group  event__field-group--destination">
           <label class="event__label  event__type-output" for="event-destination-1">
-            ${this._point.tripType}
+            ${this._data.tripType}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${this._point.destination.title}" list="destination-list-1">
-          <datalist id="destination-list-1">
-            <option value="Amsterdam"></option>
-            <option value="Geneva"></option>
-            <option value="Chamonix"></option>
-          </datalist>
+          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${this._data.destination.title}" list="destination-list-1">
+          ${this._generateDataList()}
         </div>
 
         <div class="event__field-group  event__field-group--time">
           <label class="visually-hidden" for="event-start-time-1">From</label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${dayjs(this._point.time.start).format(`DD/MM/YY hh:mm`)}">
+          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${dayjs(this._data.time.start).format(`DD/MM/YY hh:mm`)}">
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">To</label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${dayjs(this._point.time.end).format(`DD/MM/YY hh:mm`)}">
+          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${dayjs(this._data.time.end).format(`DD/MM/YY hh:mm`)}">
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -125,7 +191,7 @@ export default class FormEdit extends AbstractView {
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${this._point.price}">
+          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${this._data.price}">
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -142,7 +208,7 @@ export default class FormEdit extends AbstractView {
 
         <section class="event__section  event__section--destination">
           <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-          <p class="event__destination-description">${this._point.destination.description}</p>
+          <p class="event__destination-description">${this._data.destination.description}</p>
           <div class="event__photos-container">
             <div class="event__photos-tape">
               ${this._generatePhotos()}
@@ -155,7 +221,7 @@ export default class FormEdit extends AbstractView {
 
   _clickSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.submit();
+    this._callback.formSubmit();
   }
 
   _clickMinimizeHandler(evt) {
@@ -163,9 +229,8 @@ export default class FormEdit extends AbstractView {
     this._callback.minimize();
   }
 
-
-  setEditSubmitHandler(callback) {
-    this._callback.submit = callback;
+  setFormSubmitHandler(callback) {
+    this._callback.formSubmit = callback;
     this.getElement().querySelector(`.event__save-btn`).addEventListener(`click`, this._clickSubmitHandler);
   }
 
@@ -174,8 +239,46 @@ export default class FormEdit extends AbstractView {
     this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._clickMinimizeHandler);
   }
 
+  setDestinationInputHandler() {
+    const inputDestination = this.getElement().querySelector(`.event__input--destination`);
+    const valueBeforeChange = inputDestination.value;
+    inputDestination.addEventListener(`change`, () => {
+      if (this._data.destinations.some((destination) => destination.title === inputDestination.value)) {
+        const newDestination = this._data.destinations.find((destination) => destination.title === inputDestination.value);
+        this.updateData(
+            {
+              destination: newDestination
+            }
+        );
+      } else {
+        inputDestination.value = valueBeforeChange;
+      }
+    });
+  }
+
+  static parsePointToData(point) {
+    return Object.assign(
+        {},
+        point,
+        {
+          // additional fields here
+        }
+    );
+  }
+
+  _setInnerHandlers() {
+    this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setMinimizeClickHandler(this._callback.minimize);
+    this.setDestinationInputHandler();
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this._setDatepickers();
+  }
+
   removeElement() {
     this._element = null;
-    this._point = null;
   }
+
 }

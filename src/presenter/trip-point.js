@@ -21,6 +21,7 @@ export default class TripPoint {
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._handleSubmitForm = this._handleSubmitForm.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
+    this._handleReplaceEditToPoint = this._handleReplaceEditToPoint.bind(this);
   }
 
   init(point) {
@@ -34,8 +35,8 @@ export default class TripPoint {
 
     this._pointComponent.setEditClickHandler(this._handleEditClick);
     this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
-    this._pointEditComponent.setEditSubmitHandler(this._handleSubmitForm);
-    this._pointEditComponent.setMinimizeClickHandler(() => this._replaceEditToPoint());
+    this._pointEditComponent.setFormSubmitHandler(this._handleSubmitForm);
+    this._pointEditComponent.setMinimizeClickHandler(this._handleReplaceEditToPoint);
 
     if (prevPointComponent === null || prevPointEditComponent === null) {
       render(this._pointListContainer, this._pointComponent, RenderPosition.BEFOREEND);
@@ -101,6 +102,10 @@ export default class TripPoint {
 
   _handleSubmitForm() {
     this._changeData(this._point);
+    this._replaceEditToPoint();
+  }
+
+  _handleReplaceEditToPoint() {
     this._replaceEditToPoint();
   }
 }
