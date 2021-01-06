@@ -89,3 +89,5 @@ export default class Trip {
     this._tripPresenters[point.id] = pointPresenter;
   }
 }
+
+// я же правильно понимаю, что я сразу сделал и 6.1 и 6.2?
