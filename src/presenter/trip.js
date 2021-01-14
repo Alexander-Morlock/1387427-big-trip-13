@@ -3,10 +3,12 @@ import SortFormView from '../view/sort-form.js';
 import EmptyListTemplate from '../view/empty-list-template.js';
 import TripPointPresenter from './trip-point.js';
 import {render, RenderPosition} from '../utils/render.js';
-import {updateItem} from "../utils/common.js";
+import {updateItem} from '../utils/common.js';
+import {SortType} from '../const.js';
 
 export default class Trip {
-  constructor(mainContainer, updateRouteInfo) {
+  constructor(mainContainer, updateRouteInfo, pointsModel) {
+    this._pointsModel = pointsModel;
     this._mainContainer = mainContainer;
     this._tripEventsList = new EmptyListTemplate();
     this._sortComponent = new SortFormView();
@@ -15,20 +17,39 @@ export default class Trip {
     this._handlePointChange = this._handlePointChange.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleChangeSortMode = this._handleChangeSortMode.bind(this);
-    this._sortPointList = this._sortPointList.bind(this);
+    this._handleModelUpdate = this._handleModelUpdate.bind(this);
+    this._pointsModel.addObserver(this._handleModelUpdate);
   }
 
-  init(points) {
-    this._points = points.slice();
-    this._pointsBeforeSort = points.slice();
+  init() {
+    this._points = this._getPoints();
     this._renderSort();
     render(this._mainContainer, this._tripEventsList.getElement(), RenderPosition.BEFOREEND);
     this._renderPoints();
     this._updateRouteInfo(this._points);
   }
 
+  _handleModelUpdate() {
+    //
+  }
+
+  _getPoints() {
+    switch (this._currentSortType) {
+      case SortType.TIME: {
+        return this._pointsModel.getPoints().sort((a, b) => this._getDurationOfTrip(b) - this._getDurationOfTrip(a));
+      }
+      case SortType.PRICE: {
+        return this._pointsModel.getPoints().sort((a, b) => b.price - a.price);
+      }
+      default: {
+        return this._pointsModel.getPoints();
+      }
+    }
+  }
+
   _handleChangeSortMode(evt) {
-    this._sortPointList(evt.target.value);
+    this._currentSortType = evt.target.value;
+    this._reRenderPointList();
   }
 
   _handleModeChange() {
@@ -46,30 +67,12 @@ export default class Trip {
     return dayjs(point.time.end) - dayjs(point.time.start);
   }
 
-  _sortPointList(sortType) {
-    switch (sortType) {
-      case `sort-time`: {
-        this._points.sort((a, b) => this._getDurationOfTrip(b) - this._getDurationOfTrip(a));
-        this._reRenderPointList();
-        break;
-      }
-      case `sort-price`: {
-        this._points.sort((a, b) => b.price - a.price);
-        this._reRenderPointList();
-        break;
-      }
-      default: {
-        this._points = this._pointsBeforeSort.slice();
-        this._reRenderPointList();
-      }
-    }
-  }
-
   _reRenderPointList() {
     Object
       .values(this._tripPresenters)
       .forEach((presenter) => presenter.destroy());
     this._tripPresenters = {};
+    this._points = this._getPoints();
     this._renderPoints();
     this._updateRouteInfo(this._points);
   }
@@ -90,4 +93,3 @@ export default class Trip {
   }
 }
 
-// я же правильно понимаю, что я сразу сделал и 6.1 и 6.2?
