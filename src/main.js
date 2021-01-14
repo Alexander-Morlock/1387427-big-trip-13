@@ -2,6 +2,7 @@ import RouteInfoView from './view/route-info.js';
 import EmptyListHeaderView from './view/empty-list-header.js';
 import NoPointsView from './view/empty-trip-events.js';
 import TripPresenter from './presenter/trip.js';
+import PointsModel from './model/points.js';
 import {getGeneratedPoint} from './mock/mockdata.js';
 import {render, RenderPosition} from './utils/render.js';
 
@@ -9,6 +10,8 @@ const NUMBER_OF_LIST_ITEMS = 3;
 const pointsData = new Array(NUMBER_OF_LIST_ITEMS).fill().map(getGeneratedPoint);
 const headerContainer = document.querySelector(`.page-header`);
 const tripEventsContainer = document.querySelector(`.trip-events`);
+const pointsModel = new PointsModel();
+pointsModel.setPoints(pointsData);
 
 const updateRouteInfo = (points) => {
   if (points.length) {
@@ -23,6 +26,5 @@ const updateRouteInfo = (points) => {
   }
 };
 
-const presenter = new TripPresenter(tripEventsContainer, updateRouteInfo);
-presenter.init(pointsData);
-
+const presenter = new TripPresenter(tripEventsContainer, updateRouteInfo, pointsModel);
+presenter.init();
