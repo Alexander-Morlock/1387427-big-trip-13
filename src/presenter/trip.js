@@ -7,8 +7,9 @@ import {updateItem} from '../utils/common.js';
 import {SortType} from '../const.js';
 
 export default class Trip {
-  constructor(mainContainer, updateRouteInfo, pointsModel) {
+  constructor(mainContainer, updateRouteInfo, pointsModel, controlsModel) {
     this._pointsModel = pointsModel;
+    this._controlsModel = controlsModel;
     this._mainContainer = mainContainer;
     this._tripEventsList = new EmptyListTemplate();
     this._sortComponent = new SortFormView();
@@ -18,7 +19,9 @@ export default class Trip {
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleChangeSortMode = this._handleChangeSortMode.bind(this);
     this._handleModelUpdate = this._handleModelUpdate.bind(this);
+    this._handleFiltersChange = this._handleFiltersChange.bind(this);
     this._pointsModel.addObserver(this._handleModelUpdate);
+    this._controlsModel.addObserver(this._handleFiltersChange);
   }
 
   init() {
@@ -31,6 +34,10 @@ export default class Trip {
 
   _handleModelUpdate() {
     //
+  }
+
+  _handleFiltersChange() {
+    console.log(`filters changed`);
   }
 
   _getPoints() {
