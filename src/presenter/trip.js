@@ -37,7 +37,7 @@ export default class Trip {
   }
 
   _handleFiltersChange() {
-    console.log(`filters changed`);
+    //
   }
 
   _getPoints() {
