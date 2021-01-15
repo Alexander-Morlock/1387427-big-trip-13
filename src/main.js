@@ -17,7 +17,7 @@ const pointsModel = new PointsModel();
 pointsModel.setPoints(pointsData);
 
 const updateRouteInfo = (points) => {
-  if (points.length) {
+  if (pointsModel.getPoints().length) {
     if (headerContainer.children[0]) {
       headerContainer.children[0].remove();
     }

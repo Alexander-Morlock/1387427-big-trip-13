@@ -1,10 +1,12 @@
 import AbstractView from "./abstract.js";
+import {Controls} from '../const.js';
 
-export default class Controls extends AbstractView {
+export default class ControlsView extends AbstractView {
 
-  constructor() {
+  constructor(selectedFilter) {
     super();
     this._changeHandler = this._changeHandler.bind(this);
+    this._selectedFilter = selectedFilter;
   }
 
   getTemplate() {
@@ -18,17 +20,17 @@ export default class Controls extends AbstractView {
               <h2 class="visually-hidden">Filter events</h2>
               <form class="trip-filters" action="#" method="get">
                 <div class="trip-filters__filter">
-                  <input id="filter-everything" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="everything" checked="">
+                  <input id="filter-everything" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="everything" ${this._selectedFilter === Controls.EVERYTHING ? `checked=""` : ``}>
                   <label class="trip-filters__filter-label" for="filter-everything">Everything</label>
                 </div>
 
                 <div class="trip-filters__filter">
-                  <input id="filter-future" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="future">
+                  <input id="filter-future" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="future" ${this._selectedFilter === Controls.FUTURE ? `checked=""` : ``}>
                   <label class="trip-filters__filter-label" for="filter-future">Future</label>
                 </div>
 
                 <div class="trip-filters__filter">
-                  <input id="filter-past" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="past">
+                  <input id="filter-past" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="past" ${this._selectedFilter === Controls.PAST ? `checked=""` : ``}>
                   <label class="trip-filters__filter-label" for="filter-past">Past</label>
                 </div>
 

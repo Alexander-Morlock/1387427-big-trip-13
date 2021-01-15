@@ -3,9 +3,9 @@ import {renderAfter} from '../utils/render.js';
 
 export default class Controls {
   constructor(renderAfterElement, controlsModel) {
-    this._controlsComponent = new ControlsView();
-    this._renderAfterElement = renderAfterElement;
     this._controlsModel = controlsModel;
+    this._controlsComponent = new ControlsView(this._controlsModel.getFilter());
+    this._renderAfterElement = renderAfterElement;
     this._filtersChangeAction = this._filtersChangeAction.bind(this);
   }
 

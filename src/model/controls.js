@@ -1,12 +1,5 @@
 import Observer from "../utils/observer.js";
-const Controls = {
-  TABLE: `Table`,
-  STATS: `Stats`,
-  EVERYTHING: `everything`,
-  FUTURE: `future`,
-  PAST: `past`
-};
-
+import {Controls} from '../const.js';
 export default class ControlsModel extends Observer {
   constructor() {
     super();
