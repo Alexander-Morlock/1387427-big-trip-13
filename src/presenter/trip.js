@@ -101,8 +101,8 @@ export default class Trip {
     this._points = this._getPoints();
     if (this._points.length) {
       this._renderPoints();
-      this._updateRouteInfo(this._points);
     }
+    this._updateRouteInfo(this._points);
   }
 
   _renderSort() {

@@ -17,18 +17,25 @@ const pointsModel = new PointsModel();
 pointsModel.setPoints(pointsData);
 
 const updateRouteInfo = (points) => {
-  if (pointsModel.getPoints().length) {
+  if (points.length) {
     if (headerContainer.children[0]) {
       headerContainer.children[0].remove();
     }
-    render(headerContainer, new RouteInfoView(points).getElement(), RenderPosition.AFTERBEGIN);
+    const routeInfoView = new RouteInfoView(points);
+    render(headerContainer, routeInfoView.getElement(), RenderPosition.AFTERBEGIN);
     const renderControlsAfterThisElement = document.querySelector(`.trip-main__trip-info`);
     const controlsPresenter = new ControlsPresenter(renderControlsAfterThisElement, controlsModel);
     controlsPresenter.init();
   } else {
-    render(headerContainer, new EmptyListHeaderView().getElement(), RenderPosition.AFTERBEGIN);
-    tripEventsContainer.append(new NoPointsView().getElement());
-    tripEventsContainer.querySelector(`form`).remove();
+    if (controlsModel.getFilter() === `everything`) {
+      render(headerContainer, new EmptyListHeaderView().getElement(), RenderPosition.AFTERBEGIN);
+      tripEventsContainer.append(new NoPointsView().getElement());
+      tripEventsContainer.querySelector(`form`).remove();
+    } else {
+      document.querySelector(`.trip-info__title`).textContent = `NO RESULTS TO DISPLAY`;
+      document.querySelector(`.trip-info__dates`).textContent = `No dates to display`;
+      document.querySelector(`.trip-info__cost-value`).textContent = `0`;
+    }
   }
 };
 
