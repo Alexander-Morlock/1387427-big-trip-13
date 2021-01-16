@@ -4,7 +4,7 @@ import EmptyListTemplate from '../view/empty-list-template.js';
 import TripPointPresenter from './trip-point.js';
 import {render, RenderPosition} from '../utils/render.js';
 import {updateItem} from '../utils/common.js';
-import {SortType, Controls} from '../const.js';
+import {SortType, Controls, UserAction} from '../const.js';
 
 export default class Trip {
   constructor(mainContainer, updateRouteInfo, pointsModel, controlsModel) {
@@ -21,9 +21,10 @@ export default class Trip {
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleChangeSortMode = this._handleChangeSortMode.bind(this);
     this._handleModelUpdate = this._handleModelUpdate.bind(this);
+    this._reRenderPointList = this._reRenderPointList.bind(this);
     this._handleFiltersChange = this._handleFiltersChange.bind(this);
 
-    this._pointsModel.addObserver(this._handleModelUpdate);
+    this._pointsModel.addObserver(this._reRenderPointList);
     this._controlsModel.addObserver(this._handleFiltersChange);
   }
 
@@ -33,10 +34,6 @@ export default class Trip {
     render(this._mainContainer, this._tripEventsList.getElement(), RenderPosition.BEFOREEND);
     this._renderPoints();
     this._updateRouteInfo(this._points);
-  }
-
-  _handleModelUpdate() {
-    //
   }
 
   _handleFiltersChange() {
@@ -89,6 +86,15 @@ export default class Trip {
     this._tripPresenters[updatedPoint.id].init(updatedPoint);
   }
 
+  _handleModelUpdate(userAction, point) {
+    switch (userAction) {
+      case UserAction.DELETE_POINT: {
+        this._pointsModel.deletePoint(point);
+        break;
+      }
+    }
+  }
+
   _getDurationOfTrip(point) {
     return dayjs(point.time.end) - dayjs(point.time.start);
   }
@@ -123,7 +129,7 @@ export default class Trip {
   }
 
   _renderPoint(point) {
-    const pointPresenter = new TripPointPresenter(this._tripEventsList, this._handlePointChange, this._handleModeChange);
+    const pointPresenter = new TripPointPresenter(this._tripEventsList, this._handlePointChange, this._handleModeChange, this._handleModelUpdate);
     pointPresenter.init(point);
     this._tripPresenters[point.id] = pointPresenter;
   }

@@ -11,6 +11,7 @@ export default class FormEdit extends SmartView {
     this._datePeakerEnd = null;
     this._clickSubmitHandler = this._clickSubmitHandler.bind(this);
     this._clickMinimizeHandler = this._clickMinimizeHandler.bind(this);
+    this._clickDeleteHandler = this._clickDeleteHandler.bind(this);
     this._startDateChangeHandler = this._startDateChangeHandler.bind(this);
     this._endDateChangeHandler = this._endDateChangeHandler.bind(this);
     this._setInnerHandlers();
@@ -224,19 +225,29 @@ export default class FormEdit extends SmartView {
     this._callback.formSubmit();
   }
 
-  _clickMinimizeHandler(evt) {
-    evt.preventDefault();
-    this._callback.minimize();
-  }
-
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
     this.getElement().querySelector(`.event__save-btn`).addEventListener(`click`, this._clickSubmitHandler);
   }
 
+  _clickMinimizeHandler(evt) {
+    evt.preventDefault();
+    this._callback.minimize();
+  }
+
   setMinimizeClickHandler(callback) {
     this._callback.minimize = callback;
     this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._clickMinimizeHandler);
+  }
+
+  _clickDeleteHandler(evt) {
+    evt.preventDefault();
+    this._callback.delete();
+  }
+
+  setDeleteClickHandler(callback) {
+    this._callback.delete = callback;
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._clickDeleteHandler);
   }
 
   setDestinationInputHandler() {
