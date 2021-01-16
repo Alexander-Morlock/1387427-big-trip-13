@@ -17,6 +17,12 @@ const pointsModel = new PointsModel();
 pointsModel.setPoints(pointsData);
 
 const updateRouteInfo = (points) => {
+  const showNoResults = () => {
+    document.querySelector(`.trip-info__title`).textContent = `No results for «${controlsModel.getFilter()}» filter`.toUpperCase();
+    document.querySelector(`.trip-info__dates`).textContent = `No dates to display`;
+    document.querySelector(`.trip-info__cost-value`).textContent = `0`;
+  };
+
   switch (points.length > 0) {
     case true:
       if (headerContainer.children[0]) {
@@ -30,9 +36,7 @@ const updateRouteInfo = (points) => {
 
     case false: {
       if (pointsModel.getPoints().length) {
-        document.querySelector(`.trip-info__title`).textContent = `No results for «${controlsModel.getFilter()}» filter`.toUpperCase();
-        document.querySelector(`.trip-info__dates`).textContent = `No dates to display`;
-        document.querySelector(`.trip-info__cost-value`).textContent = `0`;
+        showNoResults();
       } else {
         headerContainer.children[0].remove();
         render(headerContainer, new EmptyListHeaderView().getElement(), RenderPosition.AFTERBEGIN);
