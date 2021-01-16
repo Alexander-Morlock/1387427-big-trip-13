@@ -5,8 +5,8 @@ import TripPresenter from './presenter/trip.js';
 import PointsModel from './model/points.js';
 import ControlsPresenter from './presenter/controls.js';
 import ControlsModel from './model/controls.js';
-import { getGeneratedPoint } from './mock/mockdata.js';
-import { render, RenderPosition } from './utils/render.js';
+import {getGeneratedPoint} from './mock/mockdata.js';
+import {render, RenderPosition} from './utils/render.js';
 
 const NUMBER_OF_LIST_ITEMS = 3;
 const pointsData = new Array(NUMBER_OF_LIST_ITEMS).fill().map(getGeneratedPoint);
