@@ -49,4 +49,10 @@ export default class ControlsView extends AbstractView {
     this.getElement().querySelector(`form`).addEventListener(`change`, this._changeHandler);
   }
 
+  setFiltersDisabled() {
+    Array.from(document.querySelectorAll(`.trip-filters__filter-input`)).forEach((input) => {
+      input.disabled = true;
+    });
+  }
+
 }

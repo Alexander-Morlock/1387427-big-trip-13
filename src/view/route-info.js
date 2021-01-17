@@ -5,6 +5,7 @@ export default class RouteInfo extends AbstractView {
   constructor(points) {
     super();
     this._points = points;
+    this._clickNewEvent = this._clickNewEvent.bind(this);
   }
 
   _generateRouteTitle() {
@@ -46,7 +47,7 @@ export default class RouteInfo extends AbstractView {
                   </p>
                 </section>
 
-                <button class="trip-main__event-add-btn  btn  btn--big  btn--yellow" type="button">New event</button>
+                <button class="trip-main__event-add-btn  btn  btn--big  btn--yellow" type="button" ${this._points.some((point) => point.unsaved) ? `disabled` : ``}>New event</button>
               </div>
             </div>`;
   }
@@ -55,4 +56,15 @@ export default class RouteInfo extends AbstractView {
     this._element = null;
     this._points = null;
   }
+
+  _clickNewEvent(evt) {
+    evt.preventDefault();
+    this._callback.newEvent();
+  }
+
+  setNewEventHandler(callback) {
+    this._callback.newEvent = callback;
+    this.getElement().querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, this._clickNewEvent);
+  }
+
 }

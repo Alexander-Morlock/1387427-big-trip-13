@@ -1,6 +1,10 @@
 import AbstractView from "./abstract.js";
 
 export default class EmptyListHeader extends AbstractView {
+  constructor() {
+    super();
+    this._clickNewEvent = this._clickNewEvent.bind(this);
+  }
 
   getTemplate() {
     return `<div class="page-body__container  page-header__container">
@@ -38,5 +42,15 @@ export default class EmptyListHeader extends AbstractView {
       <button class="trip-main__event-add-btn  btn  btn--big  btn--yellow" type="button">New event</button>
     </div>
     </div>`;
+  }
+
+  _clickNewEvent(evt) {
+    evt.preventDefault();
+    this._callback.newEvent();
+  }
+
+  setNewEventHandler(callback) {
+    this._callback.newEvent = callback;
+    this.getElement().querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, this._clickNewEvent);
   }
 }

@@ -15,15 +15,24 @@ const tripEventsContainer = document.querySelector(`.trip-events`);
 const controlsModel = new ControlsModel();
 const pointsModel = new PointsModel();
 pointsModel.setPoints(pointsData);
-let routeInfoView = null;
 
 const updateRouteInfo = (points) => {
+  let routeInfoView = null;
+  let noPointsView = null;
+  const sortBar = tripEventsContainer.querySelector(`form`);
+
   if (points.length) {
     if (headerContainer.children[0]) {
       headerContainer.children[0].remove();
     }
+    if (noPointsView) {
+      noPointsView.getElement().remove();
+      noPointsView = null;
+      sortBar.style.display = `flex`;
+    }
     routeInfoView = new RouteInfoView(points);
     render(headerContainer, routeInfoView.getElement(), RenderPosition.AFTERBEGIN);
+    routeInfoView.setNewEventHandler(pointsModel.addPoint);
     const renderControlsAfterThisElement = document.querySelector(`.trip-main__trip-info`);
     const controlsPresenter = new ControlsPresenter(renderControlsAfterThisElement, controlsModel);
     controlsPresenter.init();
@@ -33,9 +42,12 @@ const updateRouteInfo = (points) => {
       routeInfoView.showNoResults(controlsModel.getFilter());
     } else {
       headerContainer.children[0].remove();
-      render(headerContainer, new EmptyListHeaderView().getElement(), RenderPosition.AFTERBEGIN);
-      tripEventsContainer.append(new NoPointsView().getElement());
-      tripEventsContainer.querySelector(`form`).remove();
+      const emptyListHeaderView = new EmptyListHeaderView();
+      render(headerContainer, emptyListHeaderView.getElement(), RenderPosition.AFTERBEGIN);
+      emptyListHeaderView.setNewEventHandler(pointsModel.addPoint);
+      noPointsView = new NoPointsView();
+      tripEventsContainer.append(noPointsView.getElement());
+      sortBar.style.display = `none`;
     }
   }
 };

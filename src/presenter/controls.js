@@ -11,7 +11,11 @@ export default class Controls {
 
   init() {
     render(this._renderAfterElement, this._controlsComponent.getElement(), RenderPosition.AFTER);
-    this._controlsComponent.setChangeHandler(this._filtersChangeAction);
+    if (!document.querySelector(`.trip-main__event-add-btn`).disabled) {
+      this._controlsComponent.setChangeHandler(this._filtersChangeAction);
+    } else {
+      this._controlsComponent.setFiltersDisabled();
+    }
   }
 
   _filtersChangeAction(evt) {

@@ -9,9 +9,8 @@ const Mode = {
 };
 
 export default class TripPoint {
-  constructor(pointListContainer, changeData, changeMode, modelUpdate) {
+  constructor(pointListContainer, changeMode, modelUpdate) {
     this._pointListContainer = pointListContainer;
-    this._changeData = changeData;
     this._changeMode = changeMode;
     this._modelUpdate = modelUpdate;
 
@@ -19,28 +18,34 @@ export default class TripPoint {
     this._pointEditComponent = null;
     this._mode = Mode.DEFAULT;
 
-    this._handleEditClick = this._handleEditClick.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._handleSubmitForm = this._handleSubmitForm.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
     this._handleReplaceEditToPoint = this._handleReplaceEditToPoint.bind(this);
     this._handleDeletePoint = this._handleDeletePoint.bind(this);
+    this._replaceEditToPoint = this._replaceEditToPoint.bind(this);
+    this._replacePointToEdit = this._replacePointToEdit.bind(this);
+  }
+
+  _reCreatePointView() {
+    this._pointComponent = new PointView(this._point);
+    this._pointComponent.setEditClickHandler(this._replacePointToEdit);
+    this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+  }
+
+  _reCreatePointEditView() {
+    this._pointEditComponent = new PointEditView(this._point);
+    this._pointEditComponent.setFormSubmitHandler(this._handleSubmitForm);
+    this._pointEditComponent.setMinimizeClickHandler(this._handleReplaceEditToPoint);
+    this._pointEditComponent.setDeleteClickHandler(this._handleDeletePoint);
   }
 
   init(point) {
     this._point = point;
-
     const prevPointComponent = this._pointComponent;
     const prevPointEditComponent = this._pointEditComponent;
-
-    this._pointComponent = new PointView(point);
-    this._pointEditComponent = new PointEditView(point);
-
-    this._pointComponent.setEditClickHandler(this._handleEditClick);
-    this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
-    this._pointEditComponent.setFormSubmitHandler(this._handleSubmitForm);
-    this._pointEditComponent.setMinimizeClickHandler(this._handleReplaceEditToPoint);
-    this._pointEditComponent.setDeleteClickHandler(this._handleDeletePoint);
+    this._reCreatePointView();
+    this._reCreatePointEditView();
 
     if (prevPointComponent === null || prevPointEditComponent === null) {
       render(this._pointListContainer, this._pointComponent, RenderPosition.BEFOREEND);
@@ -71,6 +76,7 @@ export default class TripPoint {
   }
 
   _replacePointToEdit() {
+    this._reCreatePointEditView();
     replace(this._pointEditComponent, this._pointComponent);
     document.addEventListener(`keydown`, this._escKeyDownHandler);
     this._changeMode();
@@ -78,9 +84,15 @@ export default class TripPoint {
   }
 
   _replaceEditToPoint() {
-    replace(this._pointComponent, this._pointEditComponent);
     document.removeEventListener(`keydown`, this._escKeyDownHandler);
-    this._mode = Mode.DEFAULT;
+    if (!this._point.unsaved) {
+      this._reCreatePointView();
+      replace(this._pointComponent, this._pointEditComponent);
+      this._mode = Mode.DEFAULT;
+    } else {
+      this.destroy();
+      this._handleDeletePoint();
+    }
   }
 
   _escKeyDownHandler(evt) {
@@ -90,30 +102,20 @@ export default class TripPoint {
     }
   }
 
-  _handleEditClick() {
-    this._replacePointToEdit();
-  }
-
-  _handleFavoriteClick() {
-    this._changeData(
-        Object.assign({}, this._point,
-            {
-              isFavorite: !this._point.isFavorite
-            }
-        )
-    );
-  }
-
-  _handleSubmitForm() {
-    this._changeData(this._point);
-    this._replaceEditToPoint();
-  }
-
   _handleReplaceEditToPoint() {
     this._replaceEditToPoint();
   }
 
   _handleDeletePoint() {
-    this._modelUpdate(UserAction.DELETE_POINT, this._point);
+    this._modelUpdate(UserAction.DELETE_POINT, this._point.id);
+  }
+
+  _handleFavoriteClick() {
+    this._modelUpdate(UserAction.UPDATE_POINT, this._point.id, {isFavorite: !this._point.isFavorite});
+  }
+
+  _handleSubmitForm(updatedPoint) {
+    document.removeEventListener(`keydown`, this._escKeyDownHandler);
+    this._modelUpdate(UserAction.UPDATE_POINT, this._point.id, updatedPoint);
   }
 }

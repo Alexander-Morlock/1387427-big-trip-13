@@ -12,7 +12,7 @@ export default class RoutePoint extends AbstractView {
     this._offers = point.offers;
     this._isFavorite = point.isFavorite;
     this._price = point.price;
-    this._clickHandler = this._clickHandler.bind(this);
+    this._editClickHandler = this._editClickHandler.bind(this);
     this._clickFavoriteHandler = this._clickFavoriteHandler.bind(this);
   }
 
@@ -75,14 +75,14 @@ export default class RoutePoint extends AbstractView {
 </li>`;
   }
 
-  _clickHandler(evt) {
+  _editClickHandler(evt) {
     evt.preventDefault();
-    this._callback.click();
+    this._callback.editClick();
   }
 
   setEditClickHandler(callback) {
-    this._callback.click = callback;
-    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._clickHandler);
+    this._callback.editClick = callback;
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._editClickHandler);
   }
 
   _clickFavoriteHandler(evt) {

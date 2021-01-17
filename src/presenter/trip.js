@@ -3,7 +3,6 @@ import SortFormView from '../view/sort-form.js';
 import EmptyListTemplate from '../view/empty-list-template.js';
 import TripPointPresenter from './trip-point.js';
 import {render, RenderPosition} from '../utils/render.js';
-import {updateItem} from '../utils/common.js';
 import {SortType, Controls, UserAction} from '../const.js';
 
 export default class Trip {
@@ -17,7 +16,6 @@ export default class Trip {
     this._tripPresenters = {};
     this._currentSortType = SortType.DAY;
 
-    this._handlePointChange = this._handlePointChange.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleChangeSortMode = this._handleChangeSortMode.bind(this);
     this._handleModelUpdate = this._handleModelUpdate.bind(this);
@@ -81,15 +79,14 @@ export default class Trip {
       .forEach((presenter) => presenter.resetView());
   }
 
-  _handlePointChange(updatedPoint) {
-    this._points = updateItem(this._points, updatedPoint);
-    this._tripPresenters[updatedPoint.id].init(updatedPoint);
-  }
-
-  _handleModelUpdate(userAction, point) {
+  _handleModelUpdate(userAction, point, update) {
     switch (userAction) {
       case UserAction.DELETE_POINT: {
         this._pointsModel.deletePoint(point);
+        break;
+      }
+      case UserAction.UPDATE_POINT: {
+        this._pointsModel.updatePoint(point, update);
         break;
       }
     }
@@ -99,7 +96,10 @@ export default class Trip {
     return dayjs(point.time.end) - dayjs(point.time.start);
   }
 
-  _reRenderPointList() {
+  _reRenderPointList(userAction, newPoint) {
+    if (userAction === UserAction.ADD_POINT) {
+      this._resetSort();
+    }
     Object
       .values(this._tripPresenters)
       .forEach((presenter) => presenter.destroy());
@@ -109,6 +109,9 @@ export default class Trip {
       this._renderPoints();
     }
     this._updateRouteInfo(this._points);
+    if (userAction === UserAction.ADD_POINT) {
+      this._tripPresenters[newPoint.id]._replacePointToEdit();
+    }
   }
 
   _renderSort() {
@@ -117,6 +120,7 @@ export default class Trip {
   }
 
   _resetSort() {
+    this._currentSortType = SortType.DAY;
     this._sortComponent.getElement()
       .querySelectorAll(`input`)
       .forEach((input, index) => {
@@ -129,7 +133,7 @@ export default class Trip {
   }
 
   _renderPoint(point) {
-    const pointPresenter = new TripPointPresenter(this._tripEventsList, this._handlePointChange, this._handleModeChange, this._handleModelUpdate);
+    const pointPresenter = new TripPointPresenter(this._tripEventsList, this._handleModeChange, this._handleModelUpdate);
     pointPresenter.init(point);
     this._tripPresenters[point.id] = pointPresenter;
   }
