@@ -22,6 +22,11 @@ export default class RouteInfo extends AbstractView {
     }, 0);
   }
 
+  showNoResults(selectedFilter) {
+    document.querySelector(`.trip-info__title`).textContent = `No results for «${selectedFilter}» filter`.toUpperCase();
+    document.querySelector(`.trip-info__dates`).textContent = `No dates to display`;
+    document.querySelector(`.trip-info__cost-value`).textContent = `0`;
+  }
 
   getTemplate() {
     return `<div class="page-body__container  page-header__container">

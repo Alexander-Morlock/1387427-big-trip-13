@@ -1,5 +1,5 @@
 import ControlsView from '../view/controls.js';
-import {renderAfter} from '../utils/render.js';
+import {render, RenderPosition} from '../utils/render.js';
 
 export default class Controls {
   constructor(renderAfterElement, controlsModel) {
@@ -10,7 +10,7 @@ export default class Controls {
   }
 
   init() {
-    renderAfter(this._renderAfterElement, this._controlsComponent.getElement());
+    render(this._renderAfterElement, this._controlsComponent.getElement(), RenderPosition.AFTER);
     this._controlsComponent.setChangeHandler(this._filtersChangeAction);
   }
 

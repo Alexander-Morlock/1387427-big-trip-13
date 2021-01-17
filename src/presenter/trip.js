@@ -120,7 +120,7 @@ export default class Trip {
     this._sortComponent.getElement()
       .querySelectorAll(`input`)
       .forEach((input, index) => {
-        input.checked = index === 0 ? true : false;
+        input.checked = index === 0;
       });
   }
 
