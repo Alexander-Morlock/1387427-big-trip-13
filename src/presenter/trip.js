@@ -31,7 +31,7 @@ export default class Trip {
   init() {
     this._renderSort();
     render(this._mainContainer, this._tripEventsList.getElement(), RenderPosition.BEFOREEND);
-    this._reRenderPointList();
+    // this._reRenderPointList();
   }
 
   _handleFiltersChange() {

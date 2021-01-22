@@ -48,7 +48,7 @@ export default class RouteInfo extends AbstractView {
                     <h1 class="trip-info__title">${this._generateRouteTitle()}</h1>
 
                     <p class="trip-info__dates">${dayjs(this._points[0].time.start).format(`MMM
-                      DD`)}&nbsp;—&nbsp;${dayjs(this._points[0].time.end).format(`DD`)}</p>
+                      DD`)}&nbsp;—&nbsp;${dayjs(this._points[this._points.length - 1].time.end).format(`DD`)}</p>
                   </div>
 
                   <p class="trip-info__cost">
