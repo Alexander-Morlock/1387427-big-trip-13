@@ -9,6 +9,7 @@ import ControlsPresenter from './presenter/controls.js';
 import ControlsModel from './model/controls.js';
 import Api from './api.js';
 import {render, RenderPosition} from './utils/render.js';
+import {UpdateType} from './const.js';
 
 const AUTHORIZATION = `Basic bQ3NRTa9a6jfYotQyR`;
 const END_POINT = `https://13.ecmascript.pages.academy/big-trip`;
@@ -57,12 +58,20 @@ const updateRouteInfo = (points) => {
   }
 };
 
-const presenter = new TripPresenter(tripEventsContainer, updateRouteInfo, pointsModel, controlsModel, offersModel, destinationsModel);
+const presenter = new TripPresenter(
+    tripEventsContainer,
+    updateRouteInfo,
+    pointsModel,
+    controlsModel,
+    offersModel,
+    destinationsModel
+);
+
 api.getOffers()
 .then((offers) => offersModel.setOffers(offers))
 .then(() => api.getDestinations())
 .then((destinations) => destinationsModel.setDestinations(destinations))
 .then(() => api.getPoints())
-.then((points) => pointsModel.setPoints(points))
+.then((points) => pointsModel.setPoints(points, UpdateType.INIT))
 .then(() => presenter.init());
 

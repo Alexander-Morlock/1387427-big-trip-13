@@ -273,7 +273,7 @@ export default class FormEdit extends SmartView {
           destinations,
           offers,
           destination: {
-            description: destinations.find((destination) => destination.title === point.destination.title).description,
+            description: destinations.find((destination) => destination.name === point.destination.title),
             title: point.destination.title,
             pictures: point.destination.pictures
           }
