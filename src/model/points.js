@@ -58,7 +58,7 @@ export default class Points extends Observer {
         end: dayjs()
       },
       offers: [],
-      isFavorite: ``,
+      isFavorite: `false`,
       price: 0
     };
   }

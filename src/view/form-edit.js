@@ -250,8 +250,7 @@ export default class FormEdit extends SmartView {
 
   setDestinationInputHandler() {
     const inputDestination = this.getElement().querySelector(`.event__input--destination`);
-    const valueBeforeChange = inputDestination.value;
-    inputDestination.addEventListener(`change`, () => {
+    inputDestination.addEventListener(`input`, () => {
       if (this._data.destinations.some((destination) => destination.title === inputDestination.value)) {
         const newDestination = this._data.destinations.find((destination) => destination.title === inputDestination.value);
         this.updateData(
@@ -259,8 +258,6 @@ export default class FormEdit extends SmartView {
               destination: newDestination
             }
         );
-      } else {
-        inputDestination.value = valueBeforeChange;
       }
     });
   }
@@ -273,7 +270,7 @@ export default class FormEdit extends SmartView {
           destinations,
           offers,
           destination: {
-            description: destinations.find((destination) => destination.name === point.destination.title),
+            description: destinations.find((destination) => destination.title === point.destination.title).description,
             title: point.destination.title,
             pictures: point.destination.pictures
           }
