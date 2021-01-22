@@ -263,6 +263,7 @@ export default class FormEdit extends SmartView {
   }
 
   parsePointToData(point, offers, destinations) {
+    console.log(point);
     return Object.assign(
         {},
         point,
@@ -270,7 +271,9 @@ export default class FormEdit extends SmartView {
           destinations,
           offers,
           destination: {
-            description: destinations.find((destination) => destination.title === point.destination.title).description,
+            description: point.id
+              ? destinations.find((destination) => destination.title === point.destination.title).description
+              : `Unknown`,
             title: point.destination.title,
             pictures: point.destination.pictures
           }

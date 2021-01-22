@@ -45,13 +45,10 @@ export default class Points extends Observer {
 
   _createEmptyPoint() {
     return {
-      destinations: [],
       destination: {
         title: `Unknown`,
         pictures: [],
-        description: ``
       },
-      stopType: ``,
       tripType: defaultTripType,
       time: {
         start: dayjs(),
