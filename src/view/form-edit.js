@@ -263,7 +263,6 @@ export default class FormEdit extends SmartView {
   }
 
   parsePointToData(point, offers, destinations) {
-    console.log(point);
     return Object.assign(
         {},
         point,
