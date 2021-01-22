@@ -82,12 +82,19 @@ export default class Trip {
   _handleModelUpdate(userAction, point, update) {
     switch (userAction) {
       case UserAction.DELETE_POINT: {
-        this._pointsModel.deletePoint(point);
+        this._pointsModel.deletePoint(userAction, point);
         break;
       }
       case UserAction.UPDATE_POINT: {
-        this._pointsModel.updatePoint(point, update);
+        this._pointsModel.updatePoint(userAction, point, update);
         break;
+      }
+      case UserAction.UPDATE_EDIT_POINT: {
+        this._pointsModel.updatePoint(userAction, point, update);
+        break;
+      }
+      case UserAction.RESTORE_POINT: {
+        this._pointsModel.restorePoint();
       }
     }
   }
@@ -97,24 +104,29 @@ export default class Trip {
   }
 
   _reRenderPointList(userAction, newPoint) {
-    if (userAction === UserAction.ADD_POINT) {
-      this._resetSort();
-      this._controlsModel.setFilter(Controls.EVERYTHING);
-    }
-
     Object
-      .values(this._tripPresenters)
-      .forEach((presenter) => presenter.destroy());
+    .values(this._tripPresenters)
+    .forEach((presenter) => presenter.destroy());
     this._tripPresenters = {};
     this._points = this._getPoints();
     if (this._points.length) {
       this._renderPoints();
     }
 
-    this._updateRouteInfo(this._points);
-    if (userAction === UserAction.ADD_POINT) {
-      this._tripPresenters[newPoint.id]._replacePointToEdit();
+    switch (userAction) {
+      case UserAction.UPDATE_EDIT_POINT: {
+        this._tripPresenters[newPoint.id]._replacePointToEdit();
+        break;
+      }
+      case UserAction.ADD_POINT: {
+        this._resetSort();
+        this._controlsModel.setFilter(Controls.EVERYTHING);
+        this._tripPresenters[newPoint.id]._replacePointToEdit();
+        break;
+      }
     }
+
+    this._updateRouteInfo(this._points);
   }
 
   _renderSort() {

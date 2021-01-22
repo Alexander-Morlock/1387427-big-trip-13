@@ -14,8 +14,18 @@ export default class FormEdit extends SmartView {
     this._clickDeleteHandler = this._clickDeleteHandler.bind(this);
     this._startDateChangeHandler = this._startDateChangeHandler.bind(this);
     this._endDateChangeHandler = this._endDateChangeHandler.bind(this);
+    this._clickChangeHandler = this._clickChangeHandler.bind(this);
     this._setInnerHandlers();
     this._setDatepickers();
+    this._setTripTypeChecked();
+  }
+
+  _setTripTypeChecked() {
+    this.getElement()
+    .querySelectorAll(`.event__type-input`)
+    .forEach((radio) => {
+      radio.checked = radio.value === this._data.tripType ? true : false;
+    });
   }
 
   _setDatepickers() {
@@ -147,7 +157,7 @@ export default class FormEdit extends SmartView {
               </div>
 
               <div class="event__type-item">
-                <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight" checked>
+                <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight">
                 <label class="event__type-label  event__type-label--flight" for="event-type-flight-1">Flight</label>
               </div>
 
@@ -228,6 +238,16 @@ export default class FormEdit extends SmartView {
     this.getElement().querySelector(`.event__save-btn`).addEventListener(`click`, this._clickSubmitHandler);
   }
 
+  _clickChangeHandler(evt) {
+    evt.preventDefault();
+    this._callback.eventChange(evt.target.value);
+  }
+
+  setEventTypeChangeHandler(callback) {
+    this._callback.eventChange = callback;
+    this.getElement().querySelector(`.event__type-group`).addEventListener(`change`, this._clickChangeHandler);
+  }
+
   _clickMinimizeHandler(evt) {
     evt.preventDefault();
     this._callback.minimize();
@@ -284,6 +304,7 @@ export default class FormEdit extends SmartView {
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setMinimizeClickHandler(this._callback.minimize);
     this.setDestinationInputHandler();
+    this.setEventTypeChangeHandler(this._callback.eventChange);
   }
 
   restoreHandlers() {

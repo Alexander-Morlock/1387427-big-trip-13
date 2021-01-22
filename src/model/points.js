@@ -28,14 +28,20 @@ export default class Points extends Observer {
     this.notify(UserAction.ADD_POINT, newPoint);
   }
 
-  deletePoint(id) {
+  deletePoint(userAction, id) {
     this._points = this._points.filter((point) => point.id !== id);
-    this.notify();
+    this.notify(userAction);
   }
 
-  updatePoint(id, update) {
-    const pointToUpdate = this._points.find((point) => point.id === id);
-    this._points[this._points.indexOf(pointToUpdate)] = Object.assign({}, pointToUpdate, update);
+  updatePoint(userAction, id, update) {
+    this._pointToUpdate = this._points.find((point) => point.id === id);
+    this._points[this._points.indexOf(this._pointToUpdate)] = Object.assign({}, this._pointToUpdate, update);
+    this.notify(userAction, this._pointToUpdate);
+  }
+
+  restorePoint() {
+    this._points[this._points.indexOf(this._points.find((point) => point.id === this._pointToUpdate.id))] = this._pointToUpdate;
+    this._pointToUpdate = null;
     this.notify();
   }
 

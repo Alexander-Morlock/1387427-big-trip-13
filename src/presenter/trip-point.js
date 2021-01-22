@@ -26,6 +26,7 @@ export default class TripPoint {
     this._handleDeletePoint = this._handleDeletePoint.bind(this);
     this._replaceEditToPoint = this._replaceEditToPoint.bind(this);
     this._replacePointToEdit = this._replacePointToEdit.bind(this);
+    this._handleEventTypeChange = this._handleEventTypeChange.bind(this);
   }
 
   _reCreatePointView() {
@@ -39,6 +40,7 @@ export default class TripPoint {
     this._pointEditComponent.setFormSubmitHandler(this._handleSubmitForm);
     this._pointEditComponent.setMinimizeClickHandler(this._handleReplaceEditToPoint);
     this._pointEditComponent.setDeleteClickHandler(this._handleDeletePoint);
+    this._pointEditComponent.setEventTypeChangeHandler(this._handleEventTypeChange);
   }
 
   init(point) {
@@ -87,6 +89,9 @@ export default class TripPoint {
 
   _replaceEditToPoint() {
     document.removeEventListener(`keydown`, this._escKeyDownHandler);
+    if (this._point.unsaved) {
+      this._modelUpdate(UserAction.RESTORE_POINT);
+    }
     if (this._point.id) {
       this._reCreatePointView();
       replace(this._pointComponent, this._pointEditComponent);
@@ -119,5 +124,9 @@ export default class TripPoint {
   _handleSubmitForm(updatedPoint) {
     document.removeEventListener(`keydown`, this._escKeyDownHandler);
     this._modelUpdate(UserAction.UPDATE_POINT, this._point.id, updatedPoint);
+  }
+
+  _handleEventTypeChange(newTripType) {
+    this._modelUpdate(UserAction.UPDATE_EDIT_POINT, this._point.id, {tripType: newTripType, unsaved: true});
   }
 }

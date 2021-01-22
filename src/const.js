@@ -13,8 +13,10 @@ export const SortType = {
 
 export const UserAction = {
   UPDATE_POINT: `UPDATE_POINT`,
+  UPDATE_EDIT_POINT: `UPDATE_EDIT_POINT`,
   ADD_POINT: `ADD_POINT`,
-  DELETE_POINT: `DELETE_POINT`
+  DELETE_POINT: `DELETE_POINT`,
+  RESTORE_POINT: `RESTORE_POINT`
 };
 
 export const Controls = {
