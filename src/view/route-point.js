@@ -3,13 +3,13 @@ import {getDuration} from '../utils/render.js';
 import AbstractView from "./abstract.js";
 
 export default class RoutePoint extends AbstractView {
-  constructor(point) {
+  constructor(point, offers) {
     super();
     this._point = point;
+    this._offers = offers;
     this._destination = point.destination;
     this._tripType = point.tripType;
     this._time = point.time;
-    this._offers = point.offers;
     this._isFavorite = point.isFavorite;
     this._price = point.price;
     this._editClickHandler = this._editClickHandler.bind(this);

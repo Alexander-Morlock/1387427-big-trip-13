@@ -9,11 +9,12 @@ const Mode = {
 };
 
 export default class TripPoint {
-  constructor(pointListContainer, changeMode, modelUpdate) {
+  constructor(pointListContainer, changeMode, modelUpdate, offers, destinations) {
     this._pointListContainer = pointListContainer;
     this._changeMode = changeMode;
     this._modelUpdate = modelUpdate;
-
+    this._offers = offers;
+    this._destinations = destinations;
     this._pointComponent = null;
     this._pointEditComponent = null;
     this._mode = Mode.DEFAULT;
@@ -28,13 +29,13 @@ export default class TripPoint {
   }
 
   _reCreatePointView() {
-    this._pointComponent = new PointView(this._point);
+    this._pointComponent = new PointView(this._point, this._offersForThisPoint);
     this._pointComponent.setEditClickHandler(this._replacePointToEdit);
     this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
   }
 
   _reCreatePointEditView() {
-    this._pointEditComponent = new PointEditView(this._point);
+    this._pointEditComponent = new PointEditView(this._point, this._offersForThisPoint, this._destinations);
     this._pointEditComponent.setFormSubmitHandler(this._handleSubmitForm);
     this._pointEditComponent.setMinimizeClickHandler(this._handleReplaceEditToPoint);
     this._pointEditComponent.setDeleteClickHandler(this._handleDeletePoint);
@@ -42,6 +43,7 @@ export default class TripPoint {
 
   init(point) {
     this._point = point;
+    this._offersForThisPoint = this._offers.find((offer) => offer.type === this._point.tripType).offers;
     const prevPointComponent = this._pointComponent;
     const prevPointEditComponent = this._pointEditComponent;
     this._reCreatePointView();
@@ -85,7 +87,7 @@ export default class TripPoint {
 
   _replaceEditToPoint() {
     document.removeEventListener(`keydown`, this._escKeyDownHandler);
-    if (!this._point.unsaved) {
+    if (this._point.id) {
       this._reCreatePointView();
       replace(this._pointComponent, this._pointEditComponent);
       this._mode = Mode.DEFAULT;

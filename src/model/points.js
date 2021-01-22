@@ -1,7 +1,6 @@
+import dayjs from 'dayjs';
 import Observer from '../utils/observer.js';
 import {UserAction} from '../const.js';
-import dayjs from 'dayjs';
-import {generateId} from '../utils/common.js';
 
 const defaultTripType = `Flight`;
 
@@ -34,7 +33,7 @@ export default class Points extends Observer {
 
   updatePoint(id, update) {
     const pointToUpdate = this._points.find((point) => point.id === id);
-    this._points[this._points.indexOf(pointToUpdate)] = Object.assign({}, pointToUpdate, update, {unsaved: false});
+    this._points[this._points.indexOf(pointToUpdate)] = Object.assign({}, pointToUpdate, update);
     this.notify();
   }
 
@@ -44,7 +43,6 @@ export default class Points extends Observer {
 
   _createEmptyPoint() {
     return {
-      id: generateId(),
       destinations: [],
       destination: {
         title: `Unknown`,
@@ -59,8 +57,56 @@ export default class Points extends Observer {
       },
       offers: [],
       isFavorite: ``,
-      price: 0,
-      unsaved: true
+      price: 0
     };
+  }
+
+  static adaptToClient(point) {
+    const adaptedPoint = Object.assign(
+        {},
+        point,
+        {
+          price: point.base_price,
+          time: {
+            start: dayjs(point.date_from).format(`YYYY-MM-DDThh:mm`),
+            end: dayjs(point.date_to).format(`YYYY-MM-DDThh:mm`)
+          },
+          isFavorite: point.is_favorite,
+          tripType: point.type,
+          destination: {
+            title: point.destination.name,
+            pictures: point.destination.pictures
+          }
+        }
+    );
+
+    delete adaptedPoint.base_price;
+    delete adaptedPoint.date_from;
+    delete adaptedPoint.date_to;
+    delete adaptedPoint.is_favorite;
+    delete adaptedPoint.type;
+
+    return adaptedPoint;
+  }
+
+  static adaptToServer(point) {
+    const adaptedPoint = Object.assign(
+        {},
+        point,
+        {
+          "base_price": point.price,
+          "date_from": new Date(point.time.start).toISOString(),
+          "date_to": new Date(point.time.end).toISOString(),
+          "is_favorite": point.isFavorite,
+          "type": point.tripType
+        }
+    );
+
+    delete adaptedPoint.price;
+    delete adaptedPoint.time;
+    delete adaptedPoint.isFavorite;
+    delete adaptedPoint.tripType;
+
+    return adaptedPoint;
   }
 }

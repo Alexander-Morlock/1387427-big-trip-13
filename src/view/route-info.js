@@ -9,7 +9,16 @@ export default class RouteInfo extends AbstractView {
   }
 
   _generateRouteTitle() {
-    return this._points.map((el) => el.destination.title).join(` — `);
+    const cities = [];
+    cities.push(this._points[0].destination.title);
+    if (this._points.length > 1) {
+      for (let i = 1; i < this._points.length; i++) {
+        if (this._points[i].destination.title !== this._points[i - 1].destination.title) {
+          cities.push(this._points[i].destination.title);
+        }
+      }
+    }
+    return cities.join(` — `);
   }
 
   _getTotalPrice() {
@@ -24,9 +33,9 @@ export default class RouteInfo extends AbstractView {
   }
 
   showNoResults(selectedFilter) {
-    document.querySelector(`.trip-info__title`).textContent = `No results for «${selectedFilter}» filter`.toUpperCase();
-    document.querySelector(`.trip-info__dates`).textContent = `No dates to display`;
-    document.querySelector(`.trip-info__cost-value`).textContent = `0`;
+    this.getElement().querySelector(`.trip-info__title`).textContent = `No results for «${selectedFilter}» filter`.toUpperCase();
+    this.getElement().querySelector(`.trip-info__dates`).textContent = `No dates to display`;
+    this.getElement().querySelector(`.trip-info__cost-value`).textContent = `0`;
   }
 
   getTemplate() {
@@ -47,7 +56,7 @@ export default class RouteInfo extends AbstractView {
                   </p>
                 </section>
 
-                <button class="trip-main__event-add-btn  btn  btn--big  btn--yellow" type="button" ${this._points.some((point) => point.unsaved) ? `disabled` : ``}>New event</button>
+                <button class="trip-main__event-add-btn  btn  btn--big  btn--yellow" type="button" ${this._points.some((point) => !point.id) ? `disabled` : ``}>New event</button>
               </div>
             </div>`;
   }

@@ -4,9 +4,9 @@ import flatpickr from "flatpickr";
 import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
 export default class FormEdit extends SmartView {
-  constructor(point) {
+  constructor(point, offers, destinations) {
     super();
-    this._data = FormEdit.parsePointToData(point);
+    this._data = this.parsePointToData(point, offers, destinations);
     this._datePeakerStart = null;
     this._datePeakerEnd = null;
     this._clickSubmitHandler = this._clickSubmitHandler.bind(this);
@@ -90,9 +90,7 @@ export default class FormEdit extends SmartView {
   }
 
   _generatePhotos() {
-    return this._data.destination.photoUrl.map((photo) => {
-      return `<img class="event__photo" src="${photo}" alt="Event photo">`;
-    }).join(``);
+    return this._data.destination.pictures.map((picture) => `<img class="event__photo" src="${picture.src}" alt="${picture.description}">`).join(``);
   }
 
   _generateDataList() {
@@ -267,12 +265,18 @@ export default class FormEdit extends SmartView {
     });
   }
 
-  static parsePointToData(point) {
+  parsePointToData(point, offers, destinations) {
     return Object.assign(
         {},
         point,
         {
-          // additional fields here
+          destinations,
+          offers,
+          destination: {
+            description: destinations.find((destination) => destination.title === point.destination.title).description,
+            title: point.destination.title,
+            pictures: point.destination.pictures
+          }
         }
     );
   }

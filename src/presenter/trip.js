@@ -6,9 +6,11 @@ import {render, RenderPosition} from '../utils/render.js';
 import {SortType, Controls, UserAction} from '../const.js';
 
 export default class Trip {
-  constructor(mainContainer, updateRouteInfo, pointsModel, controlsModel) {
+  constructor(mainContainer, updateRouteInfo, pointsModel, controlsModel, offersModel, destinationsModel) {
     this._pointsModel = pointsModel;
     this._controlsModel = controlsModel;
+    this._offersModel = offersModel;
+    this._destinationsModel = destinationsModel;
     this._mainContainer = mainContainer;
     this._tripEventsList = new EmptyListTemplate();
     this._sortComponent = new SortFormView();
@@ -27,11 +29,9 @@ export default class Trip {
   }
 
   init() {
-    this._points = this._getPoints();
     this._renderSort();
     render(this._mainContainer, this._tripEventsList.getElement(), RenderPosition.BEFOREEND);
-    this._renderPoints();
-    this._updateRouteInfo(this._points);
+    this._reRenderPointList();
   }
 
   _handleFiltersChange() {
@@ -100,6 +100,7 @@ export default class Trip {
     if (userAction === UserAction.ADD_POINT) {
       this._resetSort();
     }
+
     Object
       .values(this._tripPresenters)
       .forEach((presenter) => presenter.destroy());
@@ -108,6 +109,7 @@ export default class Trip {
     if (this._points.length) {
       this._renderPoints();
     }
+
     this._updateRouteInfo(this._points);
     if (userAction === UserAction.ADD_POINT) {
       this._tripPresenters[newPoint.id]._replacePointToEdit();
@@ -133,7 +135,13 @@ export default class Trip {
   }
 
   _renderPoint(point) {
-    const pointPresenter = new TripPointPresenter(this._tripEventsList, this._handleModeChange, this._handleModelUpdate);
+    const pointPresenter = new TripPointPresenter(
+        this._tripEventsList,
+        this._handleModeChange,
+        this._handleModelUpdate,
+        this._offersModel.getOffers(),
+        this._destinationsModel.getDestinations()
+    );
     pointPresenter.init(point);
     this._tripPresenters[point.id] = pointPresenter;
   }

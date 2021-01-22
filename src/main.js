@@ -3,18 +3,23 @@ import EmptyListHeaderView from './view/empty-list-header.js';
 import NoPointsView from './view/empty-trip-events.js';
 import TripPresenter from './presenter/trip.js';
 import PointsModel from './model/points.js';
+import OffersModel from './model/offers.js';
+import DestinationsModel from './model/destinations.js';
 import ControlsPresenter from './presenter/controls.js';
 import ControlsModel from './model/controls.js';
-import {getGeneratedPoint} from './mock/mockdata.js';
+import Api from './api.js';
 import {render, RenderPosition} from './utils/render.js';
 
-const NUMBER_OF_LIST_ITEMS = 3;
-const pointsData = new Array(NUMBER_OF_LIST_ITEMS).fill().map(getGeneratedPoint);
+const AUTHORIZATION = `Basic bQ3NRTa9a6jfYotQyR`;
+const END_POINT = `https://13.ecmascript.pages.academy/big-trip`;
+const api = new Api(END_POINT, AUTHORIZATION);
+
 const headerContainer = document.querySelector(`.page-header`);
 const tripEventsContainer = document.querySelector(`.trip-events`);
 const controlsModel = new ControlsModel();
 const pointsModel = new PointsModel();
-pointsModel.setPoints(pointsData);
+const offersModel = new OffersModel();
+const destinationsModel = new DestinationsModel();
 
 const updateRouteInfo = (points) => {
   let routeInfoView = null;
@@ -52,5 +57,12 @@ const updateRouteInfo = (points) => {
   }
 };
 
-const presenter = new TripPresenter(tripEventsContainer, updateRouteInfo, pointsModel, controlsModel);
-presenter.init();
+const presenter = new TripPresenter(tripEventsContainer, updateRouteInfo, pointsModel, controlsModel, offersModel, destinationsModel);
+api.getOffers()
+.then((offers) => offersModel.setOffers(offers))
+.then(() => api.getDestinations())
+.then((destinations) => destinationsModel.setDestinations(destinations))
+.then(() => api.getPoints())
+.then((points) => pointsModel.setPoints(points))
+.then(() => presenter.init());
+
