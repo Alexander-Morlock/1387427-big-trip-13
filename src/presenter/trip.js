@@ -99,6 +99,7 @@ export default class Trip {
   _reRenderPointList(userAction, newPoint) {
     if (userAction === UserAction.ADD_POINT) {
       this._resetSort();
+      this._controlsModel.setFilter(Controls.EVERYTHING);
     }
 
     Object
