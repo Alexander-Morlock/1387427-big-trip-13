@@ -9,7 +9,7 @@ const Mode = {
 };
 
 export default class TripPoint {
-  constructor(pointListContainer, changeMode, modelUpdate, offers, destinations) {
+  constructor(pointListContainer, changeMode, modelUpdate, offers, destinations, pickrsModel) {
     this._pointListContainer = pointListContainer;
     this._changeMode = changeMode;
     this._modelUpdate = modelUpdate;
@@ -18,6 +18,7 @@ export default class TripPoint {
     this._pointComponent = null;
     this._pointEditComponent = null;
     this._mode = Mode.DEFAULT;
+    this._pickrsModel = pickrsModel;
 
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._handleSubmitForm = this._handleSubmitForm.bind(this);
@@ -36,7 +37,13 @@ export default class TripPoint {
   }
 
   _reCreatePointEditView() {
-    this._pointEditComponent = new PointEditView(this._point, this._offersForThisPoint, this._destinations);
+    this._pointEditComponent = new PointEditView(
+        this._point,
+        this._offersForThisPoint,
+        this._destinations,
+        this._pickrsModel
+    );
+
     this._pointEditComponent.setFormSubmitHandler(this._handleSubmitForm);
     this._pointEditComponent.setMinimizeClickHandler(this._handleReplaceEditToPoint);
     this._pointEditComponent.setDeleteClickHandler(this._handleDeletePoint);
@@ -122,6 +129,7 @@ export default class TripPoint {
   }
 
   _handleSubmitForm(updatedPoint) {
+    updatedPoint.unsaved = false;
     document.removeEventListener(`keydown`, this._escKeyDownHandler);
     this._modelUpdate(UserAction.UPDATE_POINT, this._point.id, updatedPoint);
   }

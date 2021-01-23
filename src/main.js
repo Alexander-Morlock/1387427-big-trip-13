@@ -69,11 +69,21 @@ const presenter = new TripPresenter(
 
 headerContainer.innerHTML = `<h1 style="text-align: center">LOADING...</h1>`;
 
-api.getOffers()
-.then((offers) => offersModel.setOffers(offers))
-.then(() => api.getDestinations())
-.then((destinations) => destinationsModel.setDestinations(destinations))
-.then(() => api.getPoints())
-.then((points) => pointsModel.setPoints(points, UpdateType.INIT))
-.then(() => presenter.init());
+// api.getOffers()
+// .then((offers) => offersModel.setOffers(offers))
+// .then(() => api.getDestinations())
+// .then((destinations) => destinationsModel.setDestinations(destinations))
+// .then(() => api.getPoints())
+// .then((points) => pointsModel.setPoints(points, UpdateType.INIT))
+// .then(() => presenter.init());
 
+Promise.all([
+  api.getOffers(),
+  api.getDestinations(),
+  api.getPoints()
+]).then((responses) => {
+  offersModel.setOffers(responses[0]);
+  destinationsModel.setDestinations(responses[1]);
+  pointsModel.setPoints(responses[2], UpdateType.INIT);
+  presenter.init();
+});

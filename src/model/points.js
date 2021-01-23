@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import Observer from '../utils/observer.js';
-import {UserAction, UpdateType} from '../const.js';
+import {UserAction} from '../const.js';
 
 const defaultTripType = `flight`;
 
@@ -11,11 +11,9 @@ export default class Points extends Observer {
     this.addPoint = this.addPoint.bind(this);
   }
 
-  setPoints(points, updateType) {
+  setPoints(points) {
     this._points = points.slice();
-    if (updateType !== UpdateType.INIT) {
-      this.notify();
-    }
+    this.notify();
   }
 
   getPoints() {

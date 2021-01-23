@@ -4,7 +4,7 @@ import flatpickr from "flatpickr";
 import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
 export default class FormEdit extends SmartView {
-  constructor(point, offers, destinations) {
+  constructor(point, offers, destinations, pickrsModel) {
     super();
     this._data = this.parsePointToData(point, offers, destinations);
     this._datePeakerStart = null;
@@ -15,6 +15,7 @@ export default class FormEdit extends SmartView {
     this._startDateChangeHandler = this._startDateChangeHandler.bind(this);
     this._endDateChangeHandler = this._endDateChangeHandler.bind(this);
     this._clickChangeHandler = this._clickChangeHandler.bind(this);
+    this._pickrsModel = pickrsModel;
     this._setInnerHandlers();
     this._setDatepickers();
     this._setTripTypeChecked();
@@ -29,13 +30,6 @@ export default class FormEdit extends SmartView {
   }
 
   _setDatepickers() {
-    if (this._datePeakerStart) {
-      this._datePeakerStart.destroy();
-      this._datePeakerStart = null;
-      this._datePeakerEnd.destroy();
-      this._datePeakerEnd = null;
-    }
-
     this._datePeakerStart = flatpickr(
         this.getElement().querySelector(`#event-start-time-1`),
         {
@@ -44,6 +38,7 @@ export default class FormEdit extends SmartView {
           onChange: this._startDateChangeHandler
         }
     );
+
     this._datePeakerEnd = flatpickr(
         this.getElement().querySelector(`#event-end-time-1`),
         {
@@ -52,6 +47,9 @@ export default class FormEdit extends SmartView {
           onChange: this._endDateChangeHandler
         }
     );
+
+    this._pickrsModel.add(this._datePeakerStart);
+    this._pickrsModel.add(this._datePeakerEnd);
   }
 
   _startDateChangeHandler() {

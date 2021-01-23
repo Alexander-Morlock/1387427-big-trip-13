@@ -2,6 +2,7 @@ import dayjs from "dayjs";
 import SortFormView from '../view/sort-form.js';
 import EmptyListTemplate from '../view/empty-list-template.js';
 import TripPointPresenter from './trip-point.js';
+import PickrsModel from '../model/pickrs.js';
 import {render, RenderPosition} from '../utils/render.js';
 import {SortType, Controls, UserAction} from '../const.js';
 
@@ -17,6 +18,7 @@ export default class Trip {
     this._updateRouteInfo = updateRouteInfo;
     this._tripPresenters = {};
     this._currentSortType = SortType.DAY;
+    this._pickrsModel = new PickrsModel();
 
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleChangeSortMode = this._handleChangeSortMode.bind(this);
@@ -31,7 +33,6 @@ export default class Trip {
   init() {
     this._renderSort();
     render(this._mainContainer, this._tripEventsList.getElement(), RenderPosition.BEFOREEND);
-    this._reRenderPointList();
   }
 
   _handleFiltersChange() {
@@ -105,6 +106,7 @@ export default class Trip {
   }
 
   _reRenderPointList(userAction, newPoint) {
+    this._pickrsModel.clear();
     Object
       .values(this._tripPresenters)
       .forEach((presenter) => presenter.destroy());
@@ -156,7 +158,8 @@ export default class Trip {
         this._handleModeChange,
         this._handleModelUpdate,
         this._offersModel.getOffers(),
-        this._destinationsModel.getDestinations()
+        this._destinationsModel.getDestinations(),
+        this._pickrsModel
     );
     pointPresenter.init(point);
     this._tripPresenters[point.id] = pointPresenter;
