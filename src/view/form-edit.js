@@ -24,7 +24,7 @@ export default class FormEdit extends SmartView {
     this.getElement()
     .querySelectorAll(`.event__type-input`)
     .forEach((radio) => {
-      radio.checked = radio.value === this._data.tripType ? true : false;
+      radio.checked = radio.value === this._data.tripType;
     });
   }
 

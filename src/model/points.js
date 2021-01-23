@@ -41,7 +41,6 @@ export default class Points extends Observer {
 
   restorePoint() {
     this._points[this._points.indexOf(this._points.find((point) => point.id === this._pointToUpdate.id))] = this._pointToUpdate;
-    this._pointToUpdate = null;
     this.notify();
   }
 

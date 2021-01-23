@@ -105,10 +105,12 @@ export default class Trip {
 
   _reRenderPointList(userAction, newPoint) {
     Object
-    .values(this._tripPresenters)
-    .forEach((presenter) => presenter.destroy());
+      .values(this._tripPresenters)
+      .forEach((presenter) => presenter.destroy());
+
     this._tripPresenters = {};
     this._points = this._getPoints();
+
     if (this._points.length) {
       this._renderPoints();
     }
