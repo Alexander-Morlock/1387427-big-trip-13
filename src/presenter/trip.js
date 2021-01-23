@@ -36,7 +36,7 @@ export default class Trip {
 
   _handleFiltersChange() {
     this._currentSortType = SortType.DAY;
-    this._reRenderPointList();
+    this._pointsModel.restorePoint();
     this._resetSort();
   }
 
