@@ -71,6 +71,7 @@ export default class Trip {
   _handleChangeSortMode(evt) {
     this._currentSortType = evt.target.value;
     this._reRenderPointList();
+    this._pointsModel.restorePoint();
   }
 
   _handleModeChange() {
