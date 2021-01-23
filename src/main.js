@@ -67,6 +67,8 @@ const presenter = new TripPresenter(
     destinationsModel
 );
 
+headerContainer.innerHTML = `<h1 style="text-align: center">LOADING...</h1>`;
+
 api.getOffers()
 .then((offers) => offersModel.setOffers(offers))
 .then(() => api.getDestinations())
