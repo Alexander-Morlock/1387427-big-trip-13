@@ -2,8 +2,6 @@ import dayjs from 'dayjs';
 import Observer from '../utils/observer.js';
 import {UserAction} from '../const.js';
 
-const defaultTripType = `flight`;
-
 export default class Points extends Observer {
   constructor(api) {
     super();
@@ -23,8 +21,13 @@ export default class Points extends Observer {
 
   addPoint() {
     const newPoint = this._createEmptyPoint();
-    this._points.unshift(newPoint);
-    this.notify(UserAction.ADD_POINT, newPoint);
+    this._api.addPoint(newPoint)
+      .then((response) => {
+        newPoint.id = response.id;
+        this._points.unshift(newPoint);
+        this.notify(UserAction.ADD_POINT, newPoint);
+      });
+
   }
 
   deletePoint(userAction, id) {
@@ -37,6 +40,9 @@ export default class Points extends Observer {
     const newPoint = Object.assign({}, this._pointToRestore, update);
     this._api.updatePoint(newPoint)
     .then(() => {
+      newPoint.offers.forEach((offer) => {
+        offer.isChecked = offer.isChecked !== false;
+      });
       this._points[this._points.indexOf(this._pointToRestore)] = newPoint;
       this.notify(userAction, this._pointToRestore);
     });
@@ -61,13 +67,22 @@ export default class Points extends Observer {
       destination: {
         title: `Unknown`,
         pictures: [],
+        description: ``
       },
-      tripType: defaultTripType,
+      tripType: `taxi`,
       time: {
         start: dayjs(),
         end: dayjs()
       },
-      offers: [],
+      offers: [
+        {
+          title: `Choose meal`,
+          price: 180
+        }, {
+          title: `Upgrade to comfort class`,
+          price: 50
+        }
+      ],
       isFavorite: `false`,
       price: 0
     };
@@ -129,8 +144,7 @@ export default class Points extends Observer {
           offers: point.offers.filter((offer) => offer.isChecked)
         }
     );
-
-    adaptedPoint.offers.forEach((offer) => delete offer.checked);
+    adaptedPoint.offers.forEach((offer) => delete offer.isChecked);
 
     delete adaptedPoint.price;
     delete adaptedPoint.time;
