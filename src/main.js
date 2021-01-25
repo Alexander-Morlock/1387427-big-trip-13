@@ -11,14 +11,14 @@ import Api from './api.js';
 import {render, RenderPosition} from './utils/render.js';
 import {UpdateType} from './const.js';
 
-const AUTHORIZATION = `Basic bQ3NRTa9a6jfYotQyR`;
+const AUTHORIZATION = `Basic bQ3NRTa9a6jfYotQyR_4`;
 const END_POINT = `https://13.ecmascript.pages.academy/big-trip`;
 const api = new Api(END_POINT, AUTHORIZATION);
 
 const headerContainer = document.querySelector(`.page-header`);
 const tripEventsContainer = document.querySelector(`.trip-events`);
 const controlsModel = new ControlsModel();
-const pointsModel = new PointsModel();
+const pointsModel = new PointsModel(api);
 const offersModel = new OffersModel();
 const destinationsModel = new DestinationsModel();
 
@@ -45,7 +45,7 @@ const updateRouteInfo = (points) => {
 
   } else {
     if (pointsModel.getPoints().length) {
-      routeInfoView.showNoResults(controlsModel.getFilter());
+      RouteInfoView.showNoResults(controlsModel.getFilter());
     } else {
       headerContainer.children[0].remove();
       const emptyListHeaderView = new EmptyListHeaderView();
@@ -53,7 +53,6 @@ const updateRouteInfo = (points) => {
       emptyListHeaderView.setNewEventHandler(pointsModel.addPoint);
       noPointsView = new NoPointsView();
       tripEventsContainer.append(noPointsView.getElement());
-      sortBar.style.display = `none`;
     }
   }
 };
@@ -66,16 +65,6 @@ const presenter = new TripPresenter(
     offersModel,
     destinationsModel
 );
-
-headerContainer.innerHTML = `<h1 style="text-align: center">LOADING...</h1>`;
-
-// api.getOffers()
-// .then((offers) => offersModel.setOffers(offers))
-// .then(() => api.getDestinations())
-// .then((destinations) => destinationsModel.setDestinations(destinations))
-// .then(() => api.getPoints())
-// .then((points) => pointsModel.setPoints(points, UpdateType.INIT))
-// .then(() => presenter.init());
 
 Promise.all([
   api.getOffers(),

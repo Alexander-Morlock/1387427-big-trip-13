@@ -3,7 +3,9 @@ import DestinationsModel from './model/destinations.js';
 
 const Method = {
   GET: `GET`,
-  PUT: `PUT`
+  PUT: `PUT`,
+  POST: `POST`,
+  DELETE: `DELETE`
 };
 
 const SuccessHTTPStatusRange = {
@@ -41,8 +43,7 @@ export default class Api {
       body: JSON.stringify(PointsModel.adaptToServer(point)),
       headers: new Headers({"Content-Type": `application/json`})
     })
-      .then(Api.toJSON)
-      .then(PointsModel.adaptToClient);
+      .then(Api.toJSON);
   }
 
   _load({

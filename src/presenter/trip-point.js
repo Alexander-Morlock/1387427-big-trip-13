@@ -31,7 +31,7 @@ export default class TripPoint {
   }
 
   _reCreatePointView() {
-    this._pointComponent = new PointView(this._point, this._offersForThisPoint);
+    this._pointComponent = new PointView(this._point);
     this._pointComponent.setEditClickHandler(this._replacePointToEdit);
     this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
   }
@@ -129,9 +129,9 @@ export default class TripPoint {
   }
 
   _handleSubmitForm(updatedPoint) {
-    updatedPoint.unsaved = false;
+    delete updatedPoint.destinations;
     document.removeEventListener(`keydown`, this._escKeyDownHandler);
-    this._modelUpdate(UserAction.UPDATE_POINT, this._point.id, updatedPoint);
+    this._modelUpdate(UserAction.SUBMIT_FORM, updatedPoint.id, updatedPoint);
   }
 
   _handleEventTypeChange(newTripType) {

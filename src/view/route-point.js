@@ -3,10 +3,9 @@ import {getDuration} from '../utils/render.js';
 import AbstractView from "./abstract.js";
 
 export default class RoutePoint extends AbstractView {
-  constructor(point, offers) {
+  constructor(point) {
     super();
     this._point = point;
-    this._offers = offers;
     this._destination = point.destination;
     this._tripType = point.tripType;
     this._time = point.time;
@@ -18,14 +17,15 @@ export default class RoutePoint extends AbstractView {
 
   _generateOfferList() {
     let markup = ``;
-    if (!this._offers) {
+    const offersToDisplay = this._point.offers.filter((offer) => offer.isChecked);
+    if (!offersToDisplay) {
       markup += `<li class="event__offer"></li>`;
     } else {
-      for (let i = 0; i < this._offers.length; i++) {
+      for (let i = 0; i < offersToDisplay.length; i++) {
         markup += `<li class="event__offer">
-        <span class="event__offer-title">${this._offers[i].title}</span>
+        <span class="event__offer-title">${offersToDisplay[i].title}</span>
         &plus;&euro;&nbsp;
-        <span class="event__offer-price">${this._offers[i].price}</span>
+        <span class="event__offer-price">${offersToDisplay[i].price}</span>
         </li>`;
       }
     }

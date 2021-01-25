@@ -17,8 +17,6 @@ export default class FormEdit extends SmartView {
     this._clickChangeHandler = this._clickChangeHandler.bind(this);
     this._pickrsModel = pickrsModel;
     this._setInnerHandlers();
-    this._setDatepickers();
-    this._setTripTypeChecked();
   }
 
   _setTripTypeChecked() {
@@ -87,7 +85,7 @@ export default class FormEdit extends SmartView {
       return `<div class="event__available-offers">`
       + this._data.offers.map((offer, index) => {
         return `<div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-${index + 1}" type="checkbox" name="event-offer-${offer.type}">
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-${index + 1}" type="checkbox" name="event-offer-${offer.type}" ${offer.isChecked ? `checked` : ``}>
       <label class="event__offer-label" for="event-offer-${offer.type}-${index + 1}">
         <span class="event__offer-title">${offer.title} </span>&plus;&euro;&nbsp;
         <span class="event__offer-price">${offer.price}</span>
@@ -228,6 +226,17 @@ export default class FormEdit extends SmartView {
 
   _clickSubmitHandler(evt) {
     evt.preventDefault();
+
+    this._data.offers = Array.from(
+        this.getElement()
+        .querySelectorAll(`.event__offer-checkbox`))
+      .map((checkbox) => {
+        return {
+          title: checkbox.parentElement.querySelector(`.event__offer-title`).textContent.trim(),
+          price: parseInt(checkbox.parentElement.querySelector(`.event__offer-price`).textContent.trim(), 10),
+          isChecked: checkbox.checked,
+        };
+      });
     this._callback.formSubmit(this._data);
   }
 
@@ -281,6 +290,13 @@ export default class FormEdit extends SmartView {
   }
 
   parsePointToData(point, offers, destinations) {
+    offers.forEach((offer) => {
+      const sameOffer = point.offers.find((pointOffer) => pointOffer.title === offer.title);
+      if (sameOffer) {
+        offer.isChecked = sameOffer.isChecked;
+      }
+    });
+
     return Object.assign(
         {},
         point,
@@ -289,7 +305,7 @@ export default class FormEdit extends SmartView {
           offers,
           destination: {
             description: point.id
-              ? destinations.find((destination) => destination.title === point.destination.title).description
+              ? point.destination.description
               : `Unknown`,
             title: point.destination.title,
             pictures: point.destination.pictures
@@ -303,11 +319,12 @@ export default class FormEdit extends SmartView {
     this.setMinimizeClickHandler(this._callback.minimize);
     this.setDestinationInputHandler();
     this.setEventTypeChangeHandler(this._callback.eventChange);
+    // this._setDatepickers();
+    this._setTripTypeChecked();
   }
 
   restoreHandlers() {
     this._setInnerHandlers();
-    this._setDatepickers();
   }
 
   removeElement() {

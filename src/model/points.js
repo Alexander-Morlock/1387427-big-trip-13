@@ -5,8 +5,9 @@ import {UserAction} from '../const.js';
 const defaultTripType = `flight`;
 
 export default class Points extends Observer {
-  constructor() {
+  constructor(api) {
     super();
+    this._api = api;
     this._points = [];
     this.addPoint = this.addPoint.bind(this);
   }
@@ -32,16 +33,23 @@ export default class Points extends Observer {
   }
 
   updatePoint(userAction, id, update) {
-    this._pointToUpdate = this._points.find((point) => point.id === id);
-    this._points[this._points.indexOf(this._pointToUpdate)] = Object.assign({}, this._pointToUpdate, update);
-    this.notify(userAction, this._pointToUpdate);
+    this._pointToRestore = this._points.find((point) => point.id === id);
+    const newPoint = Object.assign({}, this._pointToRestore, update);
+    this._api.updatePoint(newPoint)
+    .then(() => {
+      this._points[this._points.indexOf(this._pointToRestore)] = newPoint;
+      this.notify(userAction, this._pointToRestore);
+    });
   }
 
   restorePoint() {
-    if (this._pointToUpdate) {
-      this._points[this._points.indexOf(this._points.find((point) => point.id === this._pointToUpdate.id))] = this._pointToUpdate;
+    if (this._pointToRestore) {
+      this._api.updatePoint(this._pointToRestore)
+      .then(() => {
+        this._points[this._points.indexOf(this._points.find((point) => point.id === this._pointToRestore.id))] = this._pointToRestore;
+        this.notify();
+      });
     }
-    this.notify();
   }
 
   deletePointWithoutNotification(id) {
@@ -79,8 +87,16 @@ export default class Points extends Observer {
           tripType: point.type,
           destination: {
             title: point.destination.name,
-            pictures: point.destination.pictures
-          }
+            pictures: point.destination.pictures,
+            description: point.destination.description
+          },
+          offers: point.offers.map((offer) => {
+            return {
+              title: offer.title,
+              price: offer.price,
+              isChecked: true
+            };
+          })
         }
     );
 
@@ -103,14 +119,24 @@ export default class Points extends Observer {
           "date_to": new Date(point.time.end).toISOString(),
           "is_favorite": point.isFavorite,
           "type": point.tripType
+        },
+        {
+          destination: {
+            name: point.destination.title,
+            pictures: point.destination.pictures,
+            description: point.destination.description
+          },
+          offers: point.offers.filter((offer) => offer.isChecked)
         }
     );
+
+    adaptedPoint.offers.forEach((offer) => delete offer.checked);
 
     delete adaptedPoint.price;
     delete adaptedPoint.time;
     delete adaptedPoint.isFavorite;
     delete adaptedPoint.tripType;
-
+    delete adaptedPoint.unsaved;
     return adaptedPoint;
   }
 }

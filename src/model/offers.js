@@ -13,6 +13,18 @@ export default class Offers extends Observer {
   }
 
   getOffers() {
-    return this._offers.slice();
+    return this._offers
+      .map((offer) => {
+        return {
+          type: offer.type,
+          offers: offer.offers.map((o) => {
+            return {
+              title: o.title,
+              price: o.price,
+              checked: false
+            };
+          })
+        };
+      });
   }
 }

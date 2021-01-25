@@ -31,14 +31,16 @@ export default class Trip {
   }
 
   init() {
-    this._renderSort();
+    if (this._getPoints.length) {
+      this._renderSort();
+    }
     render(this._mainContainer, this._tripEventsList.getElement(), RenderPosition.BEFOREEND);
   }
 
   _handleFiltersChange() {
-    this._currentSortType = SortType.DAY;
     this._pointsModel.restorePoint();
     this._resetSort();
+    this._reRenderPointList();
   }
 
   _getPoints() {
@@ -81,22 +83,18 @@ export default class Trip {
       .forEach((presenter) => presenter.resetView());
   }
 
-  _handleModelUpdate(userAction, point, update) {
+  _handleModelUpdate(userAction, pointId, update) {
     switch (userAction) {
       case UserAction.DELETE_POINT: {
-        this._pointsModel.deletePoint(userAction, point);
-        break;
-      }
-      case UserAction.UPDATE_POINT: {
-        this._pointsModel.updatePoint(userAction, point, update);
-        break;
-      }
-      case UserAction.UPDATE_EDIT_POINT: {
-        this._pointsModel.updatePoint(userAction, point, update);
+        this._pointsModel.deletePoint(userAction, pointId);
         break;
       }
       case UserAction.RESTORE_POINT: {
         this._pointsModel.restorePoint();
+        break;
+      }
+      default: {
+        this._pointsModel.updatePoint(userAction, pointId, update);
       }
     }
   }
@@ -130,8 +128,7 @@ export default class Trip {
         break;
       }
     }
-
-    this._updateRouteInfo(this._points);
+    this._updateRouteInfo(this._getPoints());
   }
 
   _renderSort() {

@@ -32,10 +32,10 @@ export default class RouteInfo extends AbstractView {
     }, 0);
   }
 
-  showNoResults(selectedFilter) {
-    this.getElement().querySelector(`.trip-info__title`).textContent = `No results for «${selectedFilter}» filter`.toUpperCase();
-    this.getElement().querySelector(`.trip-info__dates`).textContent = `No dates to display`;
-    this.getElement().querySelector(`.trip-info__cost-value`).textContent = `0`;
+  static showNoResults(selectedFilter) {
+    document.querySelector(`.trip-info__title`).textContent = `No results for «${selectedFilter}» filter`.toUpperCase();
+    document.querySelector(`.trip-info__dates`).textContent = `No dates to display`;
+    document.querySelector(`.trip-info__cost-value`).textContent = `0`;
   }
 
   getTemplate() {
