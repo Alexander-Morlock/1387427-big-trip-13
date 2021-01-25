@@ -55,4 +55,7 @@ export default class ControlsView extends AbstractView {
     });
   }
 
+  setToggleHandler(callback) {
+    this._callback.toggle = callback;
+  }
 }

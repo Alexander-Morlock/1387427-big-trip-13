@@ -1,12 +1,14 @@
 import ControlsView from '../view/controls.js';
 import {render, RenderPosition} from '../utils/render.js';
+import {Controls, UserAction} from '../const.js';
 
-export default class Controls {
+export default class ControlsClass {
   constructor(renderAfterElement, controlsModel) {
     this._controlsModel = controlsModel;
     this._controlsComponent = new ControlsView(this._controlsModel.getFilter());
     this._renderAfterElement = renderAfterElement;
     this._filtersChangeAction = this._filtersChangeAction.bind(this);
+    this.resetControls = this.resetControls.bind(this);
   }
 
   init() {
@@ -20,5 +22,9 @@ export default class Controls {
 
   _filtersChangeAction(evt) {
     this._controlsModel.setFilter(evt.target.value);
+  }
+
+  resetControls() {
+    this._controlsModel.setFilter(Controls.EVERYTHING, UserAction.TOGGLE);
   }
 }

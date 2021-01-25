@@ -42,6 +42,7 @@ const updateRouteInfo = (points) => {
     const renderControlsAfterThisElement = document.querySelector(`.trip-main__trip-info`);
     const controlsPresenter = new ControlsPresenter(renderControlsAfterThisElement, controlsModel);
     controlsPresenter.init();
+    routeInfoView.setPageToggle(controlsPresenter);
 
   } else {
     if (pointsModel.getPoints().length) {

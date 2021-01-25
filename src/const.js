@@ -18,7 +18,8 @@ export const UserAction = {
   DELETE_POINT: `DELETE_POINT`,
   RESTORE_POINT: `RESTORE_POINT`,
   FILTER_CHANGE: `FILTER_CHANGE`,
-  SUBMIT_FORM: `SUBMIT_FORM`
+  SUBMIT_FORM: `SUBMIT_FORM`,
+  TOGGLE: `TOGGLE`
 };
 
 export const Controls = {

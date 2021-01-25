@@ -31,16 +31,18 @@ export default class Trip {
   }
 
   init() {
-    if (this._getPoints.length) {
+    if (this._getPoints().length) {
       this._renderSort();
     }
     render(this._mainContainer, this._tripEventsList.getElement(), RenderPosition.BEFOREEND);
   }
 
-  _handleFiltersChange() {
+  _handleFiltersChange(userAction) {
     this._pointsModel.restorePoint();
     this._resetSort();
-    this._reRenderPointList();
+    if (userAction !== UserAction.TOGGLE) {
+      this._reRenderPointList();
+    }
   }
 
   _getPoints() {

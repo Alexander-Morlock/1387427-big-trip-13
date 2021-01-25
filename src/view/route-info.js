@@ -1,11 +1,47 @@
-import dayjs from "dayjs";
-import AbstractView from "./abstract.js";
+import dayjs from 'dayjs';
+import AbstractView from './abstract.js';
 
 export default class RouteInfo extends AbstractView {
   constructor(points) {
     super();
     this._points = points;
     this._clickNewEvent = this._clickNewEvent.bind(this);
+  }
+
+  setPageToggle(controlsPresenter) {
+    this._tripEventsContainer = document.querySelector(`.trip-events`);
+    this._statsContainer = document.querySelector(`.statistics`);
+    this._statsContainer.classList.add(`visually-hidden`);
+    this._tableViewLink = document.querySelectorAll(`.trip-tabs__btn`)[0];
+    this._statsViewLink = document.querySelectorAll(`.trip-tabs__btn`)[1];
+
+    const toggleToStatistics = (evt) => {
+      evt.preventDefault();
+      controlsPresenter.resetControls();
+      this._statsViewLink.removeEventListener(`click`, toggleToStatistics);
+      this._tableViewLink.addEventListener(`click`, toggleToTable);
+
+      this._statsViewLink.classList.add(`trip-tabs__btn--active`);
+      this._tableViewLink.classList.remove(`trip-tabs__btn--active`);
+
+      this._statsContainer.classList.remove(`visually-hidden`);
+      this._tripEventsContainer.classList.add(`visually-hidden`);
+    };
+
+    const toggleToTable = (evt) => {
+      evt.preventDefault();
+      controlsPresenter.resetControls();
+      this._tableViewLink.removeEventListener(`click`, toggleToTable);
+      this._statsViewLink.addEventListener(`click`, toggleToStatistics);
+
+      this._tableViewLink.classList.add(`trip-tabs__btn--active`);
+      this._statsViewLink.classList.remove(`trip-tabs__btn--active`);
+
+      this._statsContainer.classList.add(`visually-hidden`);
+      this._tripEventsContainer.classList.remove(`visually-hidden`);
+    };
+
+    this._statsViewLink.addEventListener(`click`, toggleToStatistics);
   }
 
   _generateRouteTitle() {
@@ -18,7 +54,7 @@ export default class RouteInfo extends AbstractView {
         }
       }
     }
-    return cities.join(` — `);
+    return cities.length < 4 ? cities.join(` — `) : cities[0] + ` - ... - ` + cities[cities.length - 1];
   }
 
   _getTotalPrice() {
