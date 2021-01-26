@@ -20,19 +20,19 @@ export default class Points extends Observer {
   }
 
   addPoint() {
-    const newPoint = this._createEmptyPoint();
-    this._api.addPoint(newPoint)
-      .then((response) => {
-        newPoint.id = response.id;
-        this._points.unshift(newPoint);
-        this.notify(UserAction.ADD_POINT, newPoint);
-      });
+    // const newPoint = this._createEmptyPoint();
+    // this._api.addPoint(newPoint)
+    //   .then((response) => {
+    //     newPoint.id = response.id;
+    //     this._points.unshift(newPoint);
+    //     this.notify(UserAction.ADD_POINT, newPoint);
+    //   });
 
   }
 
   deletePoint(userAction, id) {
-    this._points = this._points.filter((point) => point.id !== id);
-    this.notify(userAction);
+    // this._points = this._points.filter((point) => point.id !== id);
+    // this.notify(userAction);
   }
 
   updatePoint(userAction, id, update) {
@@ -67,23 +67,15 @@ export default class Points extends Observer {
       destination: {
         title: `Unknown`,
         pictures: [],
-        description: ``
+        description: `Unknown`
       },
       tripType: `taxi`,
       time: {
         start: dayjs(),
         end: dayjs()
       },
-      offers: [
-        {
-          title: `Choose meal`,
-          price: 180
-        }, {
-          title: `Upgrade to comfort class`,
-          price: 50
-        }
-      ],
-      isFavorite: `false`,
+      offers: [],
+      isFavorite: false,
       price: 0
     };
   }
@@ -133,15 +125,13 @@ export default class Points extends Observer {
           "date_from": new Date(point.time.start).toISOString(),
           "date_to": new Date(point.time.end).toISOString(),
           "is_favorite": point.isFavorite,
-          "type": point.tripType
-        },
-        {
-          destination: {
+          "type": point.tripType,
+          "offers": point.offers.filter((offer) => offer.isChecked),
+          "destination": {
             name: point.destination.title,
             pictures: point.destination.pictures,
             description: point.destination.description
-          },
-          offers: point.offers.filter((offer) => offer.isChecked)
+          }
         }
     );
     adaptedPoint.offers.forEach((offer) => delete offer.isChecked);

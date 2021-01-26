@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import AbstractView from './abstract.js';
+import {moneyChart} from '../stats.js';
 
 export default class RouteInfo extends AbstractView {
   constructor(points) {
@@ -9,39 +10,48 @@ export default class RouteInfo extends AbstractView {
   }
 
   setPageToggle(controlsPresenter) {
-    this._tripEventsContainer = document.querySelector(`.trip-events`);
-    this._statsContainer = document.querySelector(`.statistics`);
-    this._statsContainer.classList.add(`visually-hidden`);
-    this._tableViewLink = document.querySelectorAll(`.trip-tabs__btn`)[0];
-    this._statsViewLink = document.querySelectorAll(`.trip-tabs__btn`)[1];
+    const pointsContainer = document.querySelector(`.trip-events`);
+    const statsContainer = document.querySelector(`.statistics`);
+    const tableViewLink = document.querySelectorAll(`.trip-tabs__btn`)[0];
+    const statsViewLink = document.querySelectorAll(`.trip-tabs__btn`)[1];
+    const controls = document.querySelectorAll(`.trip-filters__filter-input`);
+
+    const onKeydownHandler = (evt) => {
+      if (evt.key === `Escape`) {
+        document.removeEventListener(`keydown`, onKeydownHandler);
+        toggleToTable(evt);
+      }
+    };
 
     const toggleToStatistics = (evt) => {
       evt.preventDefault();
       controlsPresenter.resetControls();
-      this._statsViewLink.removeEventListener(`click`, toggleToStatistics);
-      this._tableViewLink.addEventListener(`click`, toggleToTable);
-
-      this._statsViewLink.classList.add(`trip-tabs__btn--active`);
-      this._tableViewLink.classList.remove(`trip-tabs__btn--active`);
-
-      this._statsContainer.classList.remove(`visually-hidden`);
-      this._tripEventsContainer.classList.add(`visually-hidden`);
+      controls.forEach((input) => {
+        input.disabled = true;
+      });
+      statsViewLink.removeEventListener(`click`, toggleToStatistics);
+      tableViewLink.addEventListener(`click`, toggleToTable);
+      statsViewLink.classList.add(`trip-tabs__btn--active`);
+      tableViewLink.classList.remove(`trip-tabs__btn--active`);
+      statsContainer.classList.remove(`visually-hidden`);
+      pointsContainer.classList.add(`visually-hidden`);
+      document.addEventListener(`keydown`, onKeydownHandler);
+      moneyChart();
     };
 
     const toggleToTable = (evt) => {
       evt.preventDefault();
-      controlsPresenter.resetControls();
-      this._tableViewLink.removeEventListener(`click`, toggleToTable);
-      this._statsViewLink.addEventListener(`click`, toggleToStatistics);
-
-      this._tableViewLink.classList.add(`trip-tabs__btn--active`);
-      this._statsViewLink.classList.remove(`trip-tabs__btn--active`);
-
-      this._statsContainer.classList.add(`visually-hidden`);
-      this._tripEventsContainer.classList.remove(`visually-hidden`);
+      controls.forEach((input) => {
+        input.disabled = false;
+      });
+      tableViewLink.removeEventListener(`click`, toggleToTable);
+      statsViewLink.addEventListener(`click`, toggleToStatistics);
+      tableViewLink.classList.add(`trip-tabs__btn--active`);
+      statsViewLink.classList.remove(`trip-tabs__btn--active`);
+      statsContainer.classList.add(`visually-hidden`);
+      pointsContainer.classList.remove(`visually-hidden`);
     };
-
-    this._statsViewLink.addEventListener(`click`, toggleToStatistics);
+    statsViewLink.addEventListener(`click`, toggleToStatistics);
   }
 
   _generateRouteTitle() {
