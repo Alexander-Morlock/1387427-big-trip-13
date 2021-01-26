@@ -86,12 +86,17 @@ export default class TripPoint {
     }
   }
 
-  _replacePointToEdit() {
+  _replacePointToEdit(userAction) {
+    document.querySelector(`#filter-past`).disabled = true;
+    document.querySelector(`#filter-future`).disabled = true;
     this._reCreatePointEditView();
     replace(this._pointEditComponent, this._pointComponent);
     document.addEventListener(`keydown`, this._escKeyDownHandler);
     this._changeMode();
     this._mode = Mode.EDITING;
+    if (userAction) {
+      document.querySelector(`.trip-main__event-add-btn`).disabled = true;
+    }
   }
 
   _replaceEditToPoint() {
@@ -125,7 +130,7 @@ export default class TripPoint {
   }
 
   _handleFavoriteClick() {
-    this._modelUpdate(UserAction.UPDATE_POINT, this._point.id, {isFavorite: !this._point.isFavorite});
+    this._modelUpdate(UserAction.CHANGE_FAVORITE, this._point.id, {isFavorite: !this._point.isFavorite});
   }
 
   _handleSubmitForm(updatedPoint) {

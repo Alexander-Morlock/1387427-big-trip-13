@@ -19,7 +19,8 @@ export const UserAction = {
   RESTORE_POINT: `RESTORE_POINT`,
   FILTER_CHANGE: `FILTER_CHANGE`,
   SUBMIT_FORM: `SUBMIT_FORM`,
-  TOGGLE: `TOGGLE`
+  TOGGLE: `TOGGLE`,
+  CHANGE_FAVORITE: `CHANGE_FAVORITE`
 };
 
 export const Controls = {

@@ -38,10 +38,9 @@ export default class Trip {
   }
 
   _handleFiltersChange(userAction) {
-    this._pointsModel.restorePoint();
     this._resetSort();
     if (userAction !== UserAction.TOGGLE) {
-      this._reRenderPointList();
+      this._reRenderPointList(userAction);
     }
   }
 
@@ -126,11 +125,13 @@ export default class Trip {
       case UserAction.ADD_POINT: {
         this._resetSort();
         this._controlsModel.setFilter(Controls.EVERYTHING);
-        this._tripPresenters[newPoint.id]._replacePointToEdit();
+        this._tripPresenters[newPoint.id]._replacePointToEdit(UserAction.ADD_POINT);
         break;
       }
+      default: {
+        this._updateRouteInfo(this._getPoints(), userAction);
+      }
     }
-    this._updateRouteInfo(this._getPoints());
   }
 
   _renderSort() {

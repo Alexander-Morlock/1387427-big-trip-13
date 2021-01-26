@@ -121,5 +121,4 @@ export default class RouteInfo extends AbstractView {
     this._callback.newEvent = callback;
     this.getElement().querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, this._clickNewEvent);
   }
-
 }

@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import Observer from '../utils/observer.js';
 import {UserAction} from '../const.js';
+const clearPointID = `_NeW_`;
 
 export default class Points extends Observer {
   constructor(api) {
@@ -20,54 +21,69 @@ export default class Points extends Observer {
   }
 
   addPoint() {
-    // const newPoint = this._createEmptyPoint();
-    // this._api.addPoint(newPoint)
-    //   .then((response) => {
-    //     newPoint.id = response.id;
-    //     this._points.unshift(newPoint);
-    //     this.notify(UserAction.ADD_POINT, newPoint);
-    //   });
-
+    this._pointToRestore = null;
+    const newPoint = this._createEmptyPoint();
+    this._points.unshift(newPoint);
+    this.notify(UserAction.ADD_POINT, newPoint);
   }
 
   deletePoint(userAction, id) {
-    // this._points = this._points.filter((point) => point.id !== id);
-    // this.notify(userAction);
-  }
-
-  updatePoint(userAction, id, update) {
-    this._pointToRestore = this._points.find((point) => point.id === id);
-    const newPoint = Object.assign({}, this._pointToRestore, update);
-    this._api.updatePoint(newPoint)
+    this._api.deletePoint(id)
     .then(() => {
-      newPoint.offers.forEach((offer) => {
-        offer.isChecked = offer.isChecked !== false;
-      });
-      this._points[this._points.indexOf(this._pointToRestore)] = newPoint;
-      this.notify(userAction, this._pointToRestore);
+      this._points = this._points.filter((point) => point.id !== id);
+      this.notify(userAction);
     });
   }
 
-  restorePoint() {
-    if (this._pointToRestore) {
-      this._api.updatePoint(this._pointToRestore)
-      .then(() => {
-        this._points[this._points.indexOf(this._points.find((point) => point.id === this._pointToRestore.id))] = this._pointToRestore;
-        this.notify();
-      });
+  updatePoint(userAction, id, update) {
+    const index = this._points.findIndex((point) => point.id === id);
+
+    const modelUpdateAndNotify = () => {
+      this._points[index] = this._newPoint;
+      if (userAction === UserAction.SUBMIT_FORM) {
+        this._pointToRestore = null;
+      }
+      this.notify(userAction, this._newPoint);
+    };
+
+    if (!this._pointToRestore && userAction !== UserAction.CHANGE_FAVORITE) {
+      this._pointToRestore = this._points[index];
+      this._newPoint = Object.assign({}, this._pointToRestore, update);
+    } else {
+      if (userAction === UserAction.CHANGE_FAVORITE) {
+        this._newPoint = Object.assign({}, this._points[index], update);
+      } else {
+        this._newPoint = Object.assign({}, this._newPoint, update);
+      }
+    }
+
+    if (userAction === UserAction.UPDATE_EDIT_POINT) {
+      modelUpdateAndNotify();
+    } else {
+      this._api.updatePoint(this._newPoint)
+      .then(() => modelUpdateAndNotify());
     }
   }
 
-  deletePointWithoutNotification(id) {
-    this._points = this._points.filter((point) => point.id !== id);
+  restorePoint() {
+    if (this._pointToRestore && this._pointToRestore.id !== clearPointID) {
+      this._points[this._points.findIndex((point) => point.id === this._pointToRestore.id)] = this._pointToRestore;
+    } else {
+      if (this._points[0].id === clearPointID) {
+        this._points.shift();
+      }
+    }
+    this._pointToRestore = null;
+    this.notify();
   }
 
   _createEmptyPoint() {
     return {
+      id: clearPointID,
       destination: {
-        title: `Unknown`,
+        title: `To Dubrovka`,
         pictures: [],
-        description: `Unknown`
+        description: `Greetings to Mikhail Ivanovich`
       },
       tripType: `taxi`,
       time: {
@@ -76,7 +92,8 @@ export default class Points extends Observer {
       },
       offers: [],
       isFavorite: false,
-      price: 0
+      price: 100,
+      unsaved: true
     };
   }
 
@@ -126,7 +143,12 @@ export default class Points extends Observer {
           "date_to": new Date(point.time.end).toISOString(),
           "is_favorite": point.isFavorite,
           "type": point.tripType,
-          "offers": point.offers.filter((offer) => offer.isChecked),
+          "offers": point.offers.filter((offer) => offer.isChecked).map((offer) => {
+            return {
+              title: offer.title,
+              price: offer.price
+            };
+          }),
           "destination": {
             name: point.destination.title,
             pictures: point.destination.pictures,
@@ -134,7 +156,6 @@ export default class Points extends Observer {
           }
         }
     );
-    adaptedPoint.offers.forEach((offer) => delete offer.isChecked);
 
     delete adaptedPoint.price;
     delete adaptedPoint.time;

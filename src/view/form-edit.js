@@ -237,6 +237,7 @@ export default class FormEdit extends SmartView {
           isChecked: checkbox.checked,
         };
       });
+    this._data.unsaved = false;
     this._callback.formSubmit(this._data);
   }
 
@@ -319,7 +320,7 @@ export default class FormEdit extends SmartView {
     this.setMinimizeClickHandler(this._callback.minimize);
     this.setDestinationInputHandler();
     this.setEventTypeChangeHandler(this._callback.eventChange);
-    this._setDatepickers();
+    // this._setDatepickers();
     this._setTripTypeChecked();
   }
 
