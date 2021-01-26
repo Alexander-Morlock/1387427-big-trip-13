@@ -320,7 +320,7 @@ export default class FormEdit extends SmartView {
     this.setMinimizeClickHandler(this._callback.minimize);
     this.setDestinationInputHandler();
     this.setEventTypeChangeHandler(this._callback.eventChange);
-    // this._setDatepickers();
+    this._setDatepickers();
     this._setTripTypeChecked();
   }
 

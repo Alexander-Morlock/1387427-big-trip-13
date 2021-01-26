@@ -60,8 +60,13 @@ export default class Points extends Observer {
     if (userAction === UserAction.UPDATE_EDIT_POINT) {
       modelUpdateAndNotify();
     } else {
-      this._api.updatePoint(this._newPoint)
-      .then(() => modelUpdateAndNotify());
+      if (userAction === UserAction.SUBMIT_FORM && this._newPoint.id === clearPointID) {
+        this._api.addPoint(this._newPoint)
+        .then(() => modelUpdateAndNotify());
+      } else {
+        this._api.updatePoint(this._newPoint)
+        .then(() => modelUpdateAndNotify());
+      }
     }
   }
 
@@ -87,8 +92,8 @@ export default class Points extends Observer {
       },
       tripType: `taxi`,
       time: {
-        start: dayjs(),
-        end: dayjs()
+        start: dayjs().format(`YYYY-MM-DDThh:mm`),
+        end: dayjs().format(`YYYY-MM-DDThh:mm`)
       },
       offers: [],
       isFavorite: false,
@@ -156,7 +161,9 @@ export default class Points extends Observer {
           }
         }
     );
-
+    if (adaptedPoint.id === clearPointID) {
+      delete adaptedPoint.id;
+    }
     delete adaptedPoint.price;
     delete adaptedPoint.time;
     delete adaptedPoint.isFavorite;
