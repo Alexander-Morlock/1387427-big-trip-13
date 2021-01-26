@@ -38,11 +38,17 @@ export default class Points extends Observer {
   updatePoint(userAction, id, update) {
     const index = this._points.findIndex((point) => point.id === id);
 
-    const modelUpdateAndNotify = () => {
+    const modelUpdateAndNotify = (newIdFromServer) => {
+      if (newIdFromServer) {
+        this._newPoint.id = newIdFromServer;
+      }
+
       this._points[index] = this._newPoint;
+
       if (userAction === UserAction.SUBMIT_FORM) {
         this._pointToRestore = null;
       }
+
       this.notify(userAction, this._newPoint);
     };
 
@@ -62,7 +68,7 @@ export default class Points extends Observer {
     } else {
       if (userAction === UserAction.SUBMIT_FORM && this._newPoint.id === clearPointID) {
         this._api.addPoint(this._newPoint)
-        .then(() => modelUpdateAndNotify());
+        .then((response) => modelUpdateAndNotify(response.id));
       } else {
         this._api.updatePoint(this._newPoint)
         .then(() => modelUpdateAndNotify());
