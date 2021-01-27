@@ -138,7 +138,7 @@ export default class Trip {
       }
       default: {
         this._reRenderPointList();
-        this._updateRouteInfo(this._getPoints(), this._resetPointsView);
+        this._updateRouteInfo(this._getPoints());
       }
     }
   }

@@ -3,11 +3,10 @@ import AbstractView from './abstract.js';
  import {moneyChart} from '../stats.js';
 
 export default class RouteInfo extends AbstractView {
-  constructor(points, resetCallback) {
+  constructor(points) {
     super();
     this._points = points;
     this._clickNewEvent = this._clickNewEvent.bind(this);
-    this._resetCallback = resetCallback;
   }
 
   setPageToggle(controlsPresenter) {
@@ -26,7 +25,6 @@ export default class RouteInfo extends AbstractView {
 
     const toggleToStatistics = (evt) => {
       evt.preventDefault();
-      // this._resetCallback();
       controlsPresenter.resetControls();
       controls.forEach((input) => {
         input.disabled = true;
