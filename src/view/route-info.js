@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import AbstractView from './abstract.js';
- import {moneyChart} from '../stats.js';
+import {moneyChart} from '../stats.js';
 
 export default class RouteInfo extends AbstractView {
   constructor(points) {
