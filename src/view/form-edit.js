@@ -2,6 +2,8 @@ import dayjs from "dayjs";
 import SmartView from "./smart.js";
 import flatpickr from "flatpickr";
 import "../../node_modules/flatpickr/dist/flatpickr.min.css";
+import isSameOrAfter from "../../node_modules/dayjs/plugin/isSameOrAfter";
+dayjs.extend(isSameOrAfter);
 
 export default class FormEdit extends SmartView {
   constructor(point, offers, destinations, pickrsModel) {
@@ -248,8 +250,6 @@ export default class FormEdit extends SmartView {
   }
 
   _validateDates() {
-    const isSameOrAfter = require(`dayjs/plugin/isSameOrAfter`);
-    dayjs.extend(isSameOrAfter);
     const dateStartInput = document.querySelector(`#event-start-time-1`);
     const dateEndInput = document.querySelector(`#event-end-time-1`);
     this._setClearOutlineListener(dateEndInput);
