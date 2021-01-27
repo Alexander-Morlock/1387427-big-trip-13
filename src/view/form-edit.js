@@ -3,6 +3,9 @@ import SmartView from "./smart.js";
 import flatpickr from "flatpickr";
 import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
+const isSameOrAfter = require(`dayjs/plugin/isSameOrAfter`);
+dayjs.extend(isSameOrAfter);
+
 export default class FormEdit extends SmartView {
   constructor(point, offers, destinations, pickrsModel) {
     super();
@@ -224,6 +227,55 @@ export default class FormEdit extends SmartView {
   </li>`;
   }
 
+  _setClearOutlineListener(element) {
+    element.addEventListener(`input`, () => {
+      element.style.outline = `none`;
+    });
+  }
+
+  _validateDestination() {
+    const destinationTitleInput = this.getElement().querySelector(`.event__input--destination`);
+    this._setClearOutlineListener(destinationTitleInput);
+    if (
+      this._data.destinations.some((destination) => destination.title === this._data.destination.title)
+    ) {
+      return true;
+    } else {
+      destinationTitleInput.setCustomValidity(`Must be one from this list: ${this._data.destinations.map((destination) => destination.title).join(`, `)}`);
+      destinationTitleInput.reportValidity();
+      destinationTitleInput.style.outline = `3px solid #FF0000`;
+      return false;
+    }
+  }
+
+  _validateDates() {
+    const dateStartInput = document.querySelector(`#event-start-time-1`);
+    const dateEndInput = document.querySelector(`#event-end-time-1`);
+    this._setClearOutlineListener(dateEndInput);
+    this._setClearOutlineListener(dateStartInput);
+
+    if (dayjs(this._data.time.end).isSameOrAfter(this._data.time.start)) {
+      return true;
+    } else {
+      dateEndInput.style.outline = `3px solid #FF0000`;
+      dateStartInput.style.outline = `3px solid #FF0000`;
+      return false;
+    }
+  }
+
+  _validatePrice() {
+    const priceInput = this.getElement().querySelector(`#event-price-1`);
+    this._setClearOutlineListener(priceInput);
+
+    if (priceInput.value >= 0) {
+      this._data.price = +priceInput.value;
+      return true;
+    } else {
+      priceInput.style.outline = `3px solid #FF0000`;
+      return false;
+    }
+  }
+
   _clickSubmitHandler(evt) {
     evt.preventDefault();
 
@@ -238,7 +290,9 @@ export default class FormEdit extends SmartView {
         };
       });
     this._data.unsaved = false;
-    this._callback.formSubmit(this._data);
+    if (this._validateDestination() && this._validateDates() && this._validatePrice()) {
+      this._callback.formSubmit(this._data);
+    }
   }
 
   setFormSubmitHandler(callback) {
