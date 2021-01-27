@@ -22,7 +22,7 @@ const pointsModel = new PointsModel(api);
 const offersModel = new OffersModel();
 const destinationsModel = new DestinationsModel();
 
-const updateRouteInfo = (points) => {
+const updateRouteInfo = (points, resetCallback) => {
   let routeInfoView = null;
   let noPointsView = null;
   const sortBar = tripEventsContainer.querySelector(`form`);
@@ -36,7 +36,7 @@ const updateRouteInfo = (points) => {
       noPointsView = null;
       sortBar.style.display = `flex`;
     }
-    routeInfoView = new RouteInfoView(points);
+    routeInfoView = new RouteInfoView(points, resetCallback);
     render(headerContainer, routeInfoView.getElement(), RenderPosition.AFTERBEGIN);
     routeInfoView.setNewEventHandler(pointsModel.addPoint);
     const renderControlsAfterThisElement = document.querySelector(`.trip-main__trip-info`);

@@ -1,8 +1,8 @@
-import dayjs from "dayjs";
-import SmartView from "./smart.js";
-import flatpickr from "flatpickr";
-import "../../node_modules/flatpickr/dist/flatpickr.min.css";
-import isSameOrAfter from "../../node_modules/dayjs/plugin/isSameOrAfter";
+import dayjs from 'dayjs';
+import SmartView from './smart.js';
+import flatpickr from 'flatpickr';
+import '../../node_modules/flatpickr/dist/flatpickr.min.css';
+import isSameOrAfter from '../../node_modules/dayjs/plugin/isSameOrAfter';
 dayjs.extend(isSameOrAfter);
 
 export default class FormEdit extends SmartView {

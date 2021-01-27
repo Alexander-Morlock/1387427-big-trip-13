@@ -3,18 +3,19 @@ import AbstractView from './abstract.js';
 import {moneyChart} from '../stats.js';
 
 export default class RouteInfo extends AbstractView {
-  constructor(points) {
+  constructor(points, resetCallback) {
     super();
     this._points = points;
     this._clickNewEvent = this._clickNewEvent.bind(this);
+    this._resetCallback = resetCallback;
   }
 
   setPageToggle(controlsPresenter) {
-    const pointsContainer = document.querySelector(`.trip-events`);
-    const statsContainer = document.querySelector(`.statistics`);
-    const tableViewLink = document.querySelectorAll(`.trip-tabs__btn`)[0];
-    const statsViewLink = document.querySelectorAll(`.trip-tabs__btn`)[1];
-    const controls = document.querySelectorAll(`.trip-filters__filter-input`);
+    this._pointsContainer = document.querySelector(`.trip-events`);
+    this._statsContainer = document.querySelector(`.statistics`);
+    this._tableViewLink = document.querySelectorAll(`.trip-tabs__btn`)[0];
+    this._statsViewLink = document.querySelectorAll(`.trip-tabs__btn`)[1];
+    this._controls = document.querySelectorAll(`.trip-filters__filter-input`);
 
     const onKeydownHandler = (evt) => {
       if (evt.key === `Escape`) {
@@ -29,32 +30,33 @@ export default class RouteInfo extends AbstractView {
       }
       evt.preventDefault();
       controlsPresenter.resetControls();
-      controls.forEach((input) => {
+      this._controls.forEach((input) => {
         input.disabled = true;
       });
-      statsViewLink.removeEventListener(`click`, toggleToStatistics);
-      tableViewLink.addEventListener(`click`, toggleToTable);
-      statsViewLink.classList.add(`trip-tabs__btn--active`);
-      tableViewLink.classList.remove(`trip-tabs__btn--active`);
-      statsContainer.classList.remove(`visually-hidden`);
-      pointsContainer.classList.add(`visually-hidden`);
+      this._statsViewLink.removeEventListener(`click`, toggleToStatistics);
+      this._tableViewLink.addEventListener(`click`, toggleToTable);
+      this._statsViewLink.classList.add(`trip-tabs__btn--active`);
+      this._tableViewLink.classList.remove(`trip-tabs__btn--active`);
+      this._statsContainer.classList.remove(`visually-hidden`);
+      this._pointsContainer.classList.add(`visually-hidden`);
       document.addEventListener(`keydown`, onKeydownHandler);
+      this._resetCallback();
       moneyChart();
     };
 
     const toggleToTable = (evt) => {
       evt.preventDefault();
-      controls.forEach((input) => {
+      this._controls.forEach((input) => {
         input.disabled = false;
       });
-      tableViewLink.removeEventListener(`click`, toggleToTable);
-      statsViewLink.addEventListener(`click`, toggleToStatistics);
-      tableViewLink.classList.add(`trip-tabs__btn--active`);
-      statsViewLink.classList.remove(`trip-tabs__btn--active`);
-      statsContainer.classList.add(`visually-hidden`);
-      pointsContainer.classList.remove(`visually-hidden`);
+      this._tableViewLink.removeEventListener(`click`, toggleToTable);
+      this._statsViewLink.addEventListener(`click`, toggleToStatistics);
+      this._tableViewLink.classList.add(`trip-tabs__btn--active`);
+      this._statsViewLink.classList.remove(`trip-tabs__btn--active`);
+      this._statsContainer.classList.add(`visually-hidden`);
+      this._pointsContainer.classList.remove(`visually-hidden`);
     };
-    statsViewLink.addEventListener(`click`, toggleToStatistics);
+    this._statsViewLink.addEventListener(`click`, toggleToStatistics);
   }
 
   _generateRouteTitle() {
@@ -117,6 +119,8 @@ export default class RouteInfo extends AbstractView {
 
   _clickNewEvent(evt) {
     evt.preventDefault();
+    this._statsContainer.classList.add(`visually-hidden`);
+    this._pointsContainer.classList.remove(`visually-hidden`);
     this._callback.newEvent();
   }
 

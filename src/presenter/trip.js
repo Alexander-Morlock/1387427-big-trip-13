@@ -20,7 +20,7 @@ export default class Trip {
     this._currentSortType = SortType.DAY;
     this._pickrsModel = new PickrsModel();
 
-    this._handleModeChange = this._handleModeChange.bind(this);
+    this._resetPointsView = this._resetPointsView.bind(this);
     this._handleChangeSortMode = this._handleChangeSortMode.bind(this);
     this._handleModelUpdate = this._handleModelUpdate.bind(this);
     this._reRenderPointList = this._reRenderPointList.bind(this);
@@ -78,7 +78,7 @@ export default class Trip {
     this._pointsModel.restorePoint();
   }
 
-  _handleModeChange() {
+  _resetPointsView() {
     Object
       .values(this._tripPresenters)
       .forEach((presenter) => presenter.resetView());
@@ -129,7 +129,7 @@ export default class Trip {
         break;
       }
       default: {
-        this._updateRouteInfo(this._getPoints(), userAction);
+        this._updateRouteInfo(this._getPoints(), this._resetPointsView);
       }
     }
   }
@@ -155,7 +155,7 @@ export default class Trip {
   _renderPoint(point) {
     const pointPresenter = new TripPointPresenter(
         this._tripEventsList,
-        this._handleModeChange,
+        this._resetPointsView,
         this._handleModelUpdate,
         this._offersModel.getOffers(),
         this._destinationsModel.getDestinations(),
