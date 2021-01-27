@@ -54,10 +54,15 @@ export default class FormEdit extends SmartView {
     this.updateData(
         {
           time: {
-            start: new Date(dayjs(this.getElement().querySelector(`#event-start-time-1`).value).format(`YYYY-DD-MMThh:mm`)).toISOString(),
+            start: new Date(dayjs(
+                this.getElement()
+                .querySelector(`#event-start-time-1`)
+                .value).format(`YYYY-DD-MMThh:mm`)
+            ).toISOString(),
             end: this._data.time.end
           }
-        });
+        }
+    );
   }
 
   _endDateChangeHandler() {
@@ -65,9 +70,14 @@ export default class FormEdit extends SmartView {
         {
           time: {
             start: this._data.time.start,
-            end: new Date(dayjs(this.getElement().querySelector(`#event-end-time-1`).value).format(`YYYY-DD-MMThh:mm`)).toISOString()
+            end: new Date(dayjs(
+                this.getElement()
+                .querySelector(`#event-end-time-1`)
+                .value).format(`YYYY-DD-MMThh:mm`)
+            ).toISOString()
           }
-        });
+        }
+    );
   }
 
   _generateOfferList() {
