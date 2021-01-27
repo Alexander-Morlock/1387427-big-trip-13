@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import AbstractView from './abstract.js';
-import {moneyChart} from '../stats.js';
+ import {moneyChart} from '../stats.js';
 
 export default class RouteInfo extends AbstractView {
   constructor(points, resetCallback) {
@@ -25,22 +25,21 @@ export default class RouteInfo extends AbstractView {
     };
 
     const toggleToStatistics = (evt) => {
-      if (document.querySelector(`.trip-main__event-add-btn`).disabled) {
-        return;
-      }
       evt.preventDefault();
+      // this._resetCallback();
       controlsPresenter.resetControls();
       controls.forEach((input) => {
         input.disabled = true;
       });
+
       statsViewLink.removeEventListener(`click`, toggleToStatistics);
       tableViewLink.addEventListener(`click`, toggleToTable);
       statsViewLink.classList.add(`trip-tabs__btn--active`);
       tableViewLink.classList.remove(`trip-tabs__btn--active`);
       this._statsContainer.classList.remove(`visually-hidden`);
       this._pointsContainer.classList.add(`visually-hidden`);
+
       document.addEventListener(`keydown`, onKeydownHandler);
-      this._resetCallback();
       moneyChart();
     };
 
@@ -49,6 +48,7 @@ export default class RouteInfo extends AbstractView {
       controls.forEach((input) => {
         input.disabled = false;
       });
+
       tableViewLink.removeEventListener(`click`, toggleToTable);
       statsViewLink.addEventListener(`click`, toggleToStatistics);
       tableViewLink.classList.add(`trip-tabs__btn--active`);
@@ -56,6 +56,7 @@ export default class RouteInfo extends AbstractView {
       this._statsContainer.classList.add(`visually-hidden`);
       this._pointsContainer.classList.remove(`visually-hidden`);
     };
+
     statsViewLink.addEventListener(`click`, toggleToStatistics);
   }
 
@@ -121,6 +122,7 @@ export default class RouteInfo extends AbstractView {
     evt.preventDefault();
     this._statsContainer.classList.add(`visually-hidden`);
     this._pointsContainer.classList.remove(`visually-hidden`);
+
     this._callback.newEvent();
   }
 

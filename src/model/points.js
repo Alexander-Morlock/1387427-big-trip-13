@@ -84,7 +84,7 @@ export default class Points extends Observer {
       }
     }
     this._pointToRestore = null;
-    this.notify();
+    this.notify(UserAction.RESTORE_POINT);
   }
 
   _createEmptyPoint() {

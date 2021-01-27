@@ -87,6 +87,8 @@ export default class TripPoint {
   }
 
   _replacePointToEdit(userAction) {
+    document.querySelector(`#filter-past`).disabled = true;
+    document.querySelector(`#filter-future`).disabled = true;
     this._reCreatePointEditView();
     replace(this._pointEditComponent, this._pointComponent);
     document.addEventListener(`keydown`, this._escKeyDownHandler);
@@ -98,6 +100,9 @@ export default class TripPoint {
   }
 
   _replaceEditToPoint() {
+    document.querySelector(`.trip-main__event-add-btn`).disabled = false;
+    document.querySelector(`#filter-past`).disabled = false;
+    document.querySelector(`#filter-future`).disabled = false;
     document.removeEventListener(`keydown`, this._escKeyDownHandler);
     if (this._point.unsaved) {
       this._modelUpdate(UserAction.RESTORE_POINT);

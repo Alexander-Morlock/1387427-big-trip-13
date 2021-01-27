@@ -23,10 +23,10 @@ export default class Trip {
     this._resetPointsView = this._resetPointsView.bind(this);
     this._handleChangeSortMode = this._handleChangeSortMode.bind(this);
     this._handleModelUpdate = this._handleModelUpdate.bind(this);
-    this._reRenderPointList = this._reRenderPointList.bind(this);
+    this._proceedModelUpdate = this._proceedModelUpdate.bind(this);
     this._handleFiltersChange = this._handleFiltersChange.bind(this);
 
-    this._pointsModel.addObserver(this._reRenderPointList);
+    this._pointsModel.addObserver(this._proceedModelUpdate);
     this._controlsModel.addObserver(this._handleFiltersChange);
   }
 
@@ -40,7 +40,9 @@ export default class Trip {
   _handleFiltersChange(userAction) {
     this._resetSort();
     if (userAction !== UserAction.TOGGLE) {
-      this._reRenderPointList(userAction);
+      this._proceedModelUpdate(userAction);
+    } else {
+      this._resetPointsView();
     }
   }
 
@@ -74,7 +76,7 @@ export default class Trip {
 
   _handleChangeSortMode(evt) {
     this._currentSortType = evt.target.value;
-    this._reRenderPointList();
+    this._proceedModelUpdate();
     this._pointsModel.restorePoint();
   }
 
@@ -104,7 +106,7 @@ export default class Trip {
     return dayjs(point.time.end) - dayjs(point.time.start);
   }
 
-  _reRenderPointList(userAction, newPoint) {
+  _reRenderPointList() {
     this._pickrsModel.clear();
     Object
       .values(this._tripPresenters)
@@ -116,7 +118,9 @@ export default class Trip {
     if (this._points.length) {
       this._renderPoints();
     }
+  }
 
+  _proceedModelUpdate(userAction, newPoint) {
     switch (userAction) {
       case UserAction.UPDATE_EDIT_POINT: {
         this._tripPresenters[newPoint.id]._replacePointToEdit();
@@ -128,7 +132,12 @@ export default class Trip {
         this._tripPresenters[newPoint.id]._replacePointToEdit(UserAction.ADD_POINT);
         break;
       }
+      case UserAction.RESTORE_POINT: {
+        this._reRenderPointList();
+        break;
+      }
       default: {
+        this._reRenderPointList();
         this._updateRouteInfo(this._getPoints(), this._resetPointsView);
       }
     }
