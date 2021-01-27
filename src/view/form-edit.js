@@ -3,9 +3,6 @@ import SmartView from "./smart.js";
 import flatpickr from "flatpickr";
 import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
-const isSameOrAfter = require(`dayjs/plugin/isSameOrAfter`);
-dayjs.extend(isSameOrAfter);
-
 export default class FormEdit extends SmartView {
   constructor(point, offers, destinations, pickrsModel) {
     super();
@@ -54,29 +51,21 @@ export default class FormEdit extends SmartView {
   }
 
   _startDateChangeHandler() {
-    const newStartDate = dayjs(
-        this.getElement().querySelector(`#event-start-time-1`).value
-    ).format(`YYYY-MM-DDThh:mm`);
-    const endDate = this._data.time.end;
     this.updateData(
         {
           time: {
-            start: newStartDate,
-            end: endDate
+            start: new Date(dayjs(this.getElement().querySelector(`#event-start-time-1`).value).format(`YYYY-DD-MMThh:mm`)).toISOString(),
+            end: this._data.time.end
           }
         });
   }
 
   _endDateChangeHandler() {
-    const newEndDate = dayjs(
-        this.getElement().querySelector(`#event-end-time-1`).value
-    ).format(`YYYY-MM-DDThh:mm`);
-    const startDate = this._data.time.start;
     this.updateData(
         {
           time: {
-            start: startDate,
-            end: newEndDate
+            start: this._data.time.start,
+            end: new Date(dayjs(this.getElement().querySelector(`#event-end-time-1`).value).format(`YYYY-DD-MMThh:mm`)).toISOString()
           }
         });
   }
@@ -227,9 +216,9 @@ export default class FormEdit extends SmartView {
   </li>`;
   }
 
-  _setClearOutlineListener(element) {
-    element.addEventListener(`input`, () => {
-      element.style.outline = `none`;
+  _setClearOutlineListener(input) {
+    input.addEventListener(`input`, () => {
+      input.style.outline = `none`;
     });
   }
 
@@ -249,6 +238,8 @@ export default class FormEdit extends SmartView {
   }
 
   _validateDates() {
+    const isSameOrAfter = require(`dayjs/plugin/isSameOrAfter`);
+    dayjs.extend(isSameOrAfter);
     const dateStartInput = document.querySelector(`#event-start-time-1`);
     const dateEndInput = document.querySelector(`#event-end-time-1`);
     this._setClearOutlineListener(dateEndInput);

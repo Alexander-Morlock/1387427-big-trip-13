@@ -1,4 +1,3 @@
-import dayjs from 'dayjs';
 import Observer from '../utils/observer.js';
 import {UserAction} from '../const.js';
 const clearPointID = `_NeW_`;
@@ -98,8 +97,8 @@ export default class Points extends Observer {
       },
       tripType: `taxi`,
       time: {
-        start: dayjs().format(`YYYY-MM-DDThh:mm`),
-        end: dayjs().format(`YYYY-MM-DDThh:mm`)
+        start: new Date(Date.now()).toISOString(),
+        end: new Date(Date.now()).toISOString()
       },
       offers: [],
       isFavorite: false,
@@ -115,8 +114,8 @@ export default class Points extends Observer {
         {
           price: point.base_price,
           time: {
-            start: dayjs(point.date_from).format(`YYYY-MM-DDThh:mm`),
-            end: dayjs(point.date_to).format(`YYYY-MM-DDThh:mm`)
+            start: point.date_from,
+            end: point.date_to
           },
           isFavorite: point.is_favorite,
           tripType: point.type,
@@ -150,8 +149,8 @@ export default class Points extends Observer {
         point,
         {
           "base_price": point.price,
-          "date_from": new Date(point.time.start).toISOString(),
-          "date_to": new Date(point.time.end).toISOString(),
+          "date_from": point.time.start,
+          "date_to": point.time.end,
           "is_favorite": point.isFavorite,
           "type": point.tripType,
           "offers": point.offers.filter((offer) => offer.isChecked).map((offer) => {
