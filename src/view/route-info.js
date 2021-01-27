@@ -24,6 +24,9 @@ export default class RouteInfo extends AbstractView {
     };
 
     const toggleToStatistics = (evt) => {
+      if (document.querySelector(`.trip-main__event-add-btn`).disabled) {
+        return;
+      }
       evt.preventDefault();
       controlsPresenter.resetControls();
       controls.forEach((input) => {
