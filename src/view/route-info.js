@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import AbstractView from './abstract.js';
-import {moneyChart, typeChart, typeTime} from '../stats.js';
+import {showStatistics} from '../stats.js';
 
 export default class RouteInfo extends AbstractView {
   constructor(points) {
@@ -39,25 +39,7 @@ export default class RouteInfo extends AbstractView {
 
       document.addEventListener(`keydown`, onKeydownHandler);
 
-      const labels = [...new Set(this._points.map((point) => point.tripType))];
-
-      const pointsSortedByLabel = labels
-          .map((label) => this._points.filter((point) => point.tripType === label));
-
-      const moneyData = pointsSortedByLabel
-          .map((points) => points.reduce((acc, reducedPoint) => acc + reducedPoint.price, 0));
-
-      const typeData = pointsSortedByLabel
-          .map((points) => points.reduce((acc) => acc + 1, 0));
-
-      const timeData = pointsSortedByLabel
-          .map((points) => dayjs(
-              points.reduce((acc, reducedPoint) => acc + dayjs(reducedPoint.time.end) - dayjs(reducedPoint.time.start), 0)
-          ).format(`DD`));
-
-      moneyChart(labels, moneyData);
-      typeChart(labels, typeData);
-      typeTime(labels, timeData);
+      showStatistics(this._points);
     };
 
     const toggleToTable = (evt) => {

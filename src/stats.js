@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 const moneyCtx = document.querySelector(`.statistics__chart--money`);
@@ -9,7 +10,7 @@ moneyCtx.height = BAR_HEIGHT * 5;
 typeCtx.height = BAR_HEIGHT * 5;
 timeCtx.height = BAR_HEIGHT * 5;
 
-export const moneyChart = (labels, data) => new Chart(moneyCtx, {
+const moneyChart = (labels, data) => new Chart(moneyCtx, {
   plugins: [ChartDataLabels],
   type: `horizontalBar`,
   data: {
@@ -74,7 +75,7 @@ export const moneyChart = (labels, data) => new Chart(moneyCtx, {
   }
 });
 
-export const typeChart = (labels, data) => new Chart(typeCtx, {
+const typeChart = (labels, data) => new Chart(typeCtx, {
   plugins: [ChartDataLabels],
   type: `horizontalBar`,
   data: {
@@ -139,7 +140,7 @@ export const typeChart = (labels, data) => new Chart(typeCtx, {
   }
 });
 
-export const typeTime = (labels, data) => new Chart(timeCtx, {
+const typeTime = (labels, data) => new Chart(timeCtx, {
   plugins: [ChartDataLabels],
   type: `horizontalBar`,
   data: {
@@ -203,3 +204,25 @@ export const typeTime = (labels, data) => new Chart(timeCtx, {
     }
   }
 });
+
+export const showStatistics = (pointsData) => {
+  const labels = [...new Set(pointsData.map((point) => point.tripType))];
+
+  const pointsSortedByLabel = labels
+          .map((label) => pointsData.filter((point) => point.tripType === label));
+
+  const moneyData = pointsSortedByLabel
+          .map((points) => points.reduce((acc, reducedPoint) => acc + reducedPoint.price, 0));
+
+  const typeData = pointsSortedByLabel
+          .map((points) => points.reduce((acc) => acc + 1, 0));
+
+  const timeData = pointsSortedByLabel
+          .map((points) => dayjs(
+              points.reduce((acc, reducedPoint) => acc + dayjs(reducedPoint.time.end) - dayjs(reducedPoint.time.start), 0)
+          ).format(`DD`));
+
+  moneyChart(labels, moneyData);
+  typeChart(labels, typeData);
+  typeTime(labels, timeData);
+};
