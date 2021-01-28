@@ -11,7 +11,7 @@ import Api from './api.js';
 import {render, RenderPosition} from './utils/render.js';
 import {UpdateType} from './const.js';
 
-const AUTHORIZATION = `Basic bQ3NRTa9a6jfYotQyR_7`;
+const AUTHORIZATION = `Basic bQ3NRTa9a6jfYotQyR_8`;
 const END_POINT = `https://13.ecmascript.pages.academy/big-trip`;
 const api = new Api(END_POINT, AUTHORIZATION);
 

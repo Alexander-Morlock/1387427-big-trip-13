@@ -1,9 +1,9 @@
 import dayjs from 'dayjs';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-const moneyCtx = document.querySelector(`.statistics__chart--money`);
-const typeCtx = document.querySelector(`.statistics__chart--transport`);
-const timeCtx = document.querySelector(`.statistics__chart--time`);
+let moneyCtx = document.querySelector(`.statistics__chart--money`);
+let typeCtx = document.querySelector(`.statistics__chart--transport`);
+let timeCtx = document.querySelector(`.statistics__chart--time`);
 
 const BAR_HEIGHT = 75;
 moneyCtx.height = BAR_HEIGHT * 5;
@@ -221,6 +221,21 @@ export const showStatistics = (pointsData) => {
           .map((points) => dayjs(
               points.reduce((acc, reducedPoint) => acc + dayjs(reducedPoint.time.end) - dayjs(reducedPoint.time.start), 0)
           ).format(`DD`));
+
+  const getNewCtx = (ctxElement) => {
+    const classNames = ctxElement.classList.value.split(` `);
+    const parentDiv = ctxElement.parentElement;
+    parentDiv.children[0].remove();
+    const newCanvas = document.createElement(`canvas`);
+    newCanvas.classList.add(classNames[0]);
+    newCanvas.classList.add(classNames[2]);
+    parentDiv.append(newCanvas);
+    return newCanvas;
+  };
+
+  moneyCtx = getNewCtx(moneyCtx);
+  typeCtx = getNewCtx(typeCtx);
+  timeCtx = getNewCtx(timeCtx);
 
   moneyChart(labels, moneyData);
   typeChart(labels, typeData);
