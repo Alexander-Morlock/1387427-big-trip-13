@@ -10,7 +10,8 @@ dayjs.extend(customParseFormat);
 export default class FormEdit extends SmartView {
   constructor(point, offers, destinations, pickrsModel) {
     super();
-    this._data = this.parsePointToData(point, offers, destinations);
+    this._data = this.parsePointToData(point, offers);
+    this._destinations = destinations;
     this._datePeakerStart = null;
     this._datePeakerEnd = null;
     this._clickSubmitHandler = this._clickSubmitHandler.bind(this);
@@ -19,6 +20,9 @@ export default class FormEdit extends SmartView {
     this._startDateChangeHandler = this._startDateChangeHandler.bind(this);
     this._endDateChangeHandler = this._endDateChangeHandler.bind(this);
     this._clickChangeHandler = this._clickChangeHandler.bind(this);
+    this._errorStartAnimation = this._errorStartAnimation.bind(this);
+    this._errorStopAnimation = this._errorStopAnimation.bind(this);
+    this._unblockForm = this._unblockForm.bind(this);
     this._pickrsModel = pickrsModel;
     this._setInnerHandlers();
   }
@@ -109,7 +113,7 @@ export default class FormEdit extends SmartView {
 
   _generateDataList() {
     return `<datalist id="destination-list-1">
-    ${this._data.destinations.reduce((acc, destination) => {
+    ${this._destinations.reduce((acc, destination) => {
     return acc + `<option value="` + destination.title + `"></option>`;
   }, ``)}
     </datalist>`;
@@ -242,11 +246,11 @@ export default class FormEdit extends SmartView {
     const destinationTitleInput = this.getElement().querySelector(`.event__input--destination`);
     this._setClearOutlineListener(destinationTitleInput);
     if (
-      this._data.destinations.some((destination) => destination.title === this._data.destination.title)
+      this._destinations.some((destination) => destination.title === this._data.destination.title)
     ) {
       return true;
     } else {
-      destinationTitleInput.setCustomValidity(`Must be one from this list: ${this._data.destinations.map((destination) => destination.title).join(`, `)}`);
+      destinationTitleInput.setCustomValidity(`Must be one from this list: ${this._destinations.map((destination) => destination.title).join(`, `)}`);
       destinationTitleInput.reportValidity();
       destinationTitleInput.style.outline = `3px solid #FF0000`;
       return false;
@@ -288,10 +292,17 @@ export default class FormEdit extends SmartView {
         });
   }
 
+  _unblockForm() {
+    this.getElement().querySelectorAll(`input`)
+        .forEach((input) => {
+          input.disabled = false;
+        });
+    this.getElement().querySelector(`.event__save-btn`).textContent = `Save`;
+    this.getElement().querySelector(`.event__reset-btn`).textContent = `Delete`;
+  }
+
   _clickSubmitHandler(evt) {
     evt.preventDefault();
-    this.getElement().querySelector(`.event__save-btn`).textContent = `Saving...`;
-    this._blockForm();
 
     this._data.offers = Array.from(
         this.getElement()
@@ -305,7 +316,9 @@ export default class FormEdit extends SmartView {
       });
     this._data.unsaved = false;
     if (this._validateDestination() && this._validateDates() && this._validatePrice()) {
-      this._callback.formSubmit(this._data);
+      this.getElement().querySelector(`.event__save-btn`).textContent = `Saving...`;
+      this._blockForm();
+      this._callback.formSubmit(this._data, this._errorStartAnimation);
     }
   }
 
@@ -338,7 +351,18 @@ export default class FormEdit extends SmartView {
     evt.preventDefault();
     this.getElement().querySelector(`.event__reset-btn`).textContent = `Deleting...`;
     this._blockForm();
-    this._callback.delete();
+    this._callback.delete(this._errorStartAnimation);
+  }
+
+  _errorStopAnimation() {
+    this.getElement().querySelector(`form`).classList.remove(`form-error`);
+    this._unblockForm();
+  }
+
+  _errorStartAnimation() {
+    this._errorStopAnimation();
+    this.getElement().querySelector(`form`).classList.add(`form-error`);
+    window.setTimeout(this._errorStopAnimation, 500);
   }
 
   setDeleteClickHandler(callback) {
@@ -349,8 +373,8 @@ export default class FormEdit extends SmartView {
   setDestinationInputHandler() {
     const inputDestination = this.getElement().querySelector(`.event__input--destination`);
     inputDestination.addEventListener(`input`, () => {
-      if (this._data.destinations.some((destination) => destination.title === inputDestination.value)) {
-        const newDestination = this._data.destinations.find((destination) => destination.title === inputDestination.value);
+      if (this._destinations.some((destination) => destination.title === inputDestination.value)) {
+        const newDestination = this._destinations.find((destination) => destination.title === inputDestination.value);
         this.updateData(
             {
               destination: newDestination
@@ -360,7 +384,7 @@ export default class FormEdit extends SmartView {
     });
   }
 
-  parsePointToData(point, offers, destinations) {
+  parsePointToData(point, offers) {
     offers.forEach((offer) => {
       const sameOffer = point.offers.find((pointOffer) => pointOffer.title === offer.title);
       if (sameOffer) {
@@ -372,7 +396,7 @@ export default class FormEdit extends SmartView {
         {},
         point,
         {
-          destinations,
+          destinations: this._destinations,
           offers,
           destination: {
             description: point.id

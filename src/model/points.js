@@ -26,15 +26,15 @@ export default class Points extends Observer {
     this.notify(UserAction.ADD_POINT, newPoint);
   }
 
-  deletePoint(userAction, id) {
+  deletePoint(userAction, id, errorFormAnimationCallback) {
     this._api.deletePoint(id)
     .then(() => {
       this._points = this._points.filter((point) => point.id !== id);
       this.notify(userAction);
-    });
+    }).catch((err) => errorFormAnimationCallback(err));
   }
 
-  updatePoint(userAction, id, update) {
+  updatePoint(userAction, id, update, errorFormAnimationCallback, removeEscapeEventListener) {
     const index = this._points.findIndex((point) => point.id === id);
 
     const modelUpdateAndNotify = (newIdFromServer) => {
@@ -67,10 +67,22 @@ export default class Points extends Observer {
     } else {
       if (userAction === UserAction.SUBMIT_FORM && this._newPoint.id === clearPointID) {
         this._api.addPoint(this._newPoint)
-        .then((response) => modelUpdateAndNotify(response.id));
+        .then((response) => modelUpdateAndNotify(response.id))
+        .then(() => removeEscapeEventListener())
+        .catch((err) => {
+          if (errorFormAnimationCallback) {
+            errorFormAnimationCallback(err);
+          }
+        });
       } else {
         this._api.updatePoint(this._newPoint)
-        .then(() => modelUpdateAndNotify());
+        .then(() => modelUpdateAndNotify())
+        .then(() => removeEscapeEventListener())
+        .catch((err) => {
+          if (errorFormAnimationCallback) {
+            errorFormAnimationCallback(err);
+          }
+        });
       }
     }
   }

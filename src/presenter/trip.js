@@ -86,14 +86,18 @@ export default class Trip {
       .forEach((presenter) => presenter.resetView());
   }
 
-  _handleModelUpdate(userAction, pointId, update) {
+  _handleModelUpdate(userAction, pointId, update, errorFormAnimationCallback, removeEscapeEventListener) {
     switch (userAction) {
       case UserAction.DELETE_POINT: {
-        this._pointsModel.deletePoint(userAction, pointId);
+        this._pointsModel.deletePoint(userAction, pointId, update);
         break;
       }
       case UserAction.RESTORE_POINT: {
         this._pointsModel.restorePoint();
+        break;
+      }
+      case UserAction.SUBMIT_FORM: {
+        this._pointsModel.updatePoint(userAction, pointId, update, errorFormAnimationCallback, removeEscapeEventListener);
         break;
       }
       default: {

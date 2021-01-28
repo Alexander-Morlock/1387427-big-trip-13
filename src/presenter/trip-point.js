@@ -28,6 +28,7 @@ export default class TripPoint {
     this._replaceEditToPoint = this._replaceEditToPoint.bind(this);
     this._replacePointToEdit = this._replacePointToEdit.bind(this);
     this._handleEventTypeChange = this._handleEventTypeChange.bind(this);
+    this._removeEscapeEventListener = this._removeEscapeEventListener.bind(this);
   }
 
   _reCreatePointView() {
@@ -124,18 +125,20 @@ export default class TripPoint {
     this._replaceEditToPoint();
   }
 
-  _handleDeletePoint() {
-    this._modelUpdate(UserAction.DELETE_POINT, this._point.id);
+  _handleDeletePoint(errorFormAnimationCallback) {
+    this._modelUpdate(UserAction.DELETE_POINT, this._point.id, errorFormAnimationCallback);
   }
 
   _handleFavoriteClick() {
     this._modelUpdate(UserAction.CHANGE_FAVORITE, this._point.id, {isFavorite: !this._point.isFavorite});
   }
 
-  _handleSubmitForm(updatedPoint) {
-    delete updatedPoint.destinations;
+  _removeEscapeEventListener() {
     document.removeEventListener(`keydown`, this._escKeyDownHandler);
-    this._modelUpdate(UserAction.SUBMIT_FORM, updatedPoint.id, updatedPoint);
+  }
+
+  _handleSubmitForm(updatedPoint, errorFormAnimationCallback) {
+    this._modelUpdate(UserAction.SUBMIT_FORM, updatedPoint.id, updatedPoint, errorFormAnimationCallback, this._removeEscapeEventListener);
   }
 
   _handleEventTypeChange(newTripType) {
