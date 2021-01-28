@@ -36,6 +36,7 @@ export default class FormEdit extends SmartView {
         this.getElement().querySelector(`#event-start-time-1`),
         {
           dateFormat: `d/m/y H:i`,
+          enableTime: true,
           defaultDate: dayjs(this._data.time.start).format(`DD/MM/YY hh:mm`),
           onChange: this._startDateChangeHandler
         }
@@ -45,6 +46,7 @@ export default class FormEdit extends SmartView {
         this.getElement().querySelector(`#event-end-time-1`),
         {
           dateFormat: `d/m/y H:i`,
+          enableTime: true,
           defaultDate: dayjs(this._data.time.end).format(`DD/MM/YY hh:mm`),
           onChange: this._endDateChangeHandler
         }
