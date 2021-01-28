@@ -252,8 +252,8 @@ export default class FormEdit extends SmartView {
   }
 
   _validateDates() {
-    const dateStartInput = document.querySelector(`#event-start-time-1`);
-    const dateEndInput = document.querySelector(`#event-end-time-1`);
+    const dateStartInput = this.getElement().querySelector(`#event-start-time-1`);
+    const dateEndInput = this.getElement().querySelector(`#event-end-time-1`);
     this._setClearOutlineListener(dateEndInput);
     this._setClearOutlineListener(dateStartInput);
 

@@ -1,62 +1,10 @@
 import dayjs from 'dayjs';
 import AbstractView from './abstract.js';
-import {showStatistics} from '../stats.js';
 
 export default class RouteInfo extends AbstractView {
   constructor(points) {
     super();
     this._points = points;
-    this._clickNewEvent = this._clickNewEvent.bind(this);
-  }
-
-  setPageToggle(controlsPresenter) {
-    this._pointsContainer = document.querySelector(`.trip-events`);
-    this._statsContainer = document.querySelector(`.statistics`);
-    const tableViewLink = document.querySelectorAll(`.trip-tabs__btn`)[0];
-    const statsViewLink = document.querySelectorAll(`.trip-tabs__btn`)[1];
-    const controls = document.querySelectorAll(`.trip-filters__filter-input`);
-
-    const onKeydownHandler = (evt) => {
-      if (evt.key === `Escape`) {
-        document.removeEventListener(`keydown`, onKeydownHandler);
-        toggleToTable(evt);
-      }
-    };
-
-    const toggleToStatistics = (evt) => {
-      evt.preventDefault();
-      controlsPresenter.resetControls();
-      controls.forEach((input) => {
-        input.disabled = true;
-      });
-
-      statsViewLink.removeEventListener(`click`, toggleToStatistics);
-      tableViewLink.addEventListener(`click`, toggleToTable);
-      statsViewLink.classList.add(`trip-tabs__btn--active`);
-      tableViewLink.classList.remove(`trip-tabs__btn--active`);
-      this._statsContainer.classList.remove(`visually-hidden`);
-      this._pointsContainer.classList.add(`visually-hidden`);
-
-      document.addEventListener(`keydown`, onKeydownHandler);
-
-      showStatistics(this._points);
-    };
-
-    const toggleToTable = (evt) => {
-      evt.preventDefault();
-      controls.forEach((input) => {
-        input.disabled = false;
-      });
-
-      tableViewLink.removeEventListener(`click`, toggleToTable);
-      statsViewLink.addEventListener(`click`, toggleToStatistics);
-      tableViewLink.classList.add(`trip-tabs__btn--active`);
-      statsViewLink.classList.remove(`trip-tabs__btn--active`);
-      this._statsContainer.classList.add(`visually-hidden`);
-      this._pointsContainer.classList.remove(`visually-hidden`);
-    };
-
-    statsViewLink.addEventListener(`click`, toggleToStatistics);
   }
 
   _generateRouteTitle() {
@@ -115,18 +63,5 @@ export default class RouteInfo extends AbstractView {
   removeElement() {
     this._element = null;
     this._points = null;
-  }
-
-  _clickNewEvent(evt) {
-    evt.preventDefault();
-    this._statsContainer.classList.add(`visually-hidden`);
-    this._pointsContainer.classList.remove(`visually-hidden`);
-
-    this._callback.newEvent();
-  }
-
-  setNewEventHandler(callback) {
-    this._callback.newEvent = callback;
-    this.getElement().querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, this._clickNewEvent);
   }
 }

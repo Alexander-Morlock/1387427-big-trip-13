@@ -106,7 +106,10 @@ export default class Trip {
     return dayjs(point.time.end) - dayjs(point.time.start);
   }
 
-  _reRenderPointList() {
+  _reRenderPointList(userAction) {
+    if (userAction === UserAction.FILTER_CHANGE) {
+      this._pointsModel.restorePoint();
+    }
     this._pickrsModel.clear();
     Object
       .values(this._tripPresenters)
@@ -123,7 +126,7 @@ export default class Trip {
   _proceedModelUpdate(userAction, newPoint) {
     switch (userAction) {
       case UserAction.UPDATE_EDIT_POINT: {
-        this._reRenderPointList();
+        this._reRenderPointList(userAction);
         this._tripPresenters[newPoint.id]._replacePointToEdit();
         break;
       }
@@ -134,11 +137,11 @@ export default class Trip {
         break;
       }
       case UserAction.RESTORE_POINT: {
-        this._reRenderPointList();
+        this._reRenderPointList(userAction);
         break;
       }
       default: {
-        this._reRenderPointList();
+        this._reRenderPointList(userAction);
         this._updateRouteInfo(this._getPoints());
       }
     }

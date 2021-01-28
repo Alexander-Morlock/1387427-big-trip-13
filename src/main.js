@@ -38,11 +38,8 @@ const updateRouteInfo = (points, resetCallback) => {
     }
     routeInfoView = new RouteInfoView(points, resetCallback);
     render(headerContainer, routeInfoView.getElement(), RenderPosition.AFTERBEGIN);
-    routeInfoView.setNewEventHandler(pointsModel.addPoint);
-    const renderControlsAfterThisElement = document.querySelector(`.trip-main__trip-info`);
-    const controlsPresenter = new ControlsPresenter(renderControlsAfterThisElement, controlsModel);
-    controlsPresenter.init();
-    routeInfoView.setPageToggle(controlsPresenter);
+    const controlsPresenter = new ControlsPresenter(controlsModel, pointsModel.addPoint);
+    controlsPresenter.init(pointsModel.getPoints());
 
   } else {
     if (pointsModel.getPoints().length) {
