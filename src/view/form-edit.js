@@ -281,8 +281,17 @@ export default class FormEdit extends SmartView {
     }
   }
 
+  _blockForm() {
+    this.getElement().querySelectorAll(`input`)
+        .forEach((input) => {
+          input.disabled = true;
+        });
+  }
+
   _clickSubmitHandler(evt) {
     evt.preventDefault();
+    this.getElement().querySelector(`.event__save-btn`).textContent = `Saving...`;
+    this._blockForm();
 
     this._data.offers = Array.from(
         this.getElement()
@@ -327,6 +336,8 @@ export default class FormEdit extends SmartView {
 
   _clickDeleteHandler(evt) {
     evt.preventDefault();
+    this.getElement().querySelector(`.event__reset-btn`).textContent = `Deleting...`;
+    this._blockForm();
     this._callback.delete();
   }
 
