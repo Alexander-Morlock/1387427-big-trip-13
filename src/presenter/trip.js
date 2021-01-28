@@ -123,6 +123,7 @@ export default class Trip {
   _proceedModelUpdate(userAction, newPoint) {
     switch (userAction) {
       case UserAction.UPDATE_EDIT_POINT: {
+        this._reRenderPointList();
         this._tripPresenters[newPoint.id]._replacePointToEdit();
         break;
       }
