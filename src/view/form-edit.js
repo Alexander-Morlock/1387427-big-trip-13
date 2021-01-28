@@ -3,7 +3,9 @@ import SmartView from './smart.js';
 import flatpickr from 'flatpickr';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 import isSameOrAfter from '../../node_modules/dayjs/plugin/isSameOrAfter';
+import customParseFormat from '../../node_modules/dayjs/plugin/customParseFormat';
 dayjs.extend(isSameOrAfter);
+dayjs.extend(customParseFormat);
 
 export default class FormEdit extends SmartView {
   constructor(point, offers, destinations, pickrsModel) {
@@ -59,7 +61,7 @@ export default class FormEdit extends SmartView {
             start: new Date(dayjs(
                 this.getElement()
                 .querySelector(`#event-start-time-1`)
-                .value).format(`YYYY-DD-MMThh:mm`)
+                .value, `DD/MM/YY hh:mm`)
             ).toISOString(),
             end: this._data.time.end
           }
@@ -75,7 +77,7 @@ export default class FormEdit extends SmartView {
             end: new Date(dayjs(
                 this.getElement()
                 .querySelector(`#event-end-time-1`)
-                .value).format(`YYYY-DD-MMThh:mm`)
+                .value, `DD/MM/YY hh:mm`)
             ).toISOString()
           }
         }
