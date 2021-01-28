@@ -4,19 +4,18 @@ const moneyCtx = document.querySelector(`.statistics__chart--money`);
 const typeCtx = document.querySelector(`.statistics__chart--transport`);
 const timeCtx = document.querySelector(`.statistics__chart--time`);
 
-// Рассчитаем высоту канваса в зависимости от того, сколько данных в него будет передаваться
-const BAR_HEIGHT = 55;
+const BAR_HEIGHT = 75;
 moneyCtx.height = BAR_HEIGHT * 5;
 typeCtx.height = BAR_HEIGHT * 5;
 timeCtx.height = BAR_HEIGHT * 5;
 
-export const moneyChart = new Chart(moneyCtx, {
+export const moneyChart = (labels, data) => new Chart(moneyCtx, {
   plugins: [ChartDataLabels],
   type: `horizontalBar`,
   data: {
-    labels: [`TAXI`, `BUS`, `TRAIN`, `SHIP`, `TRANSPORT`, `DRIVE`],
+    labels: labels.map((label) => label.toUpperCase()),
     datasets: [{
-      data: [400, 300, 200, 160, 150, 100],
+      data,
       backgroundColor: `#ffffff`,
       hoverBackgroundColor: `#ffffff`,
       anchor: `start`
@@ -75,13 +74,13 @@ export const moneyChart = new Chart(moneyCtx, {
   }
 });
 
-export const typeChart = new Chart(typeCtx, {
+export const typeChart = (labels, data) => new Chart(typeCtx, {
   plugins: [ChartDataLabels],
   type: `horizontalBar`,
   data: {
-    labels: [`TAXI`, `BUS`, `TRAIN`, `SHIP`, `TRANSPORT`, `DRIVE`],
+    labels: labels.map((label) => label.toUpperCase()),
     datasets: [{
-      data: [4, 3, 2, 1, 1, 1],
+      data,
       backgroundColor: `#ffffff`,
       hoverBackgroundColor: `#ffffff`,
       anchor: `start`
@@ -140,13 +139,13 @@ export const typeChart = new Chart(typeCtx, {
   }
 });
 
-export const typeTime = new Chart(timeCtx, {
+export const typeTime = (labels, data) => new Chart(timeCtx, {
   plugins: [ChartDataLabels],
   type: `horizontalBar`,
   data: {
-    labels: [`TAXI`, `BUS`, `TRAIN`, `SHIP`, `TRANSPORT`, `DRIVE`],
+    labels: labels.map((label) => label.toUpperCase()),
     datasets: [{
-      data: [4, 3, 2, 1, 1, 1],
+      data,
       backgroundColor: `#ffffff`,
       hoverBackgroundColor: `#ffffff`,
       anchor: `start`
