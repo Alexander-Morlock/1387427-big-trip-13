@@ -1,7 +1,8 @@
 export const UpdateType = {
   PATCH: `PATCH`,
   MINOR: `MINOR`,
-  MAJOR: `MAJOR`
+  MAJOR: `MAJOR`,
+  INIT: `INIT`
 };
 
 export const SortType = {
@@ -12,8 +13,14 @@ export const SortType = {
 
 export const UserAction = {
   UPDATE_POINT: `UPDATE_POINT`,
+  UPDATE_EDIT_POINT: `UPDATE_EDIT_POINT`,
   ADD_POINT: `ADD_POINT`,
-  DELETE_POINT: `DELETE_POINT`
+  DELETE_POINT: `DELETE_POINT`,
+  RESTORE_POINT: `RESTORE_POINT`,
+  FILTER_CHANGE: `FILTER_CHANGE`,
+  SUBMIT_FORM: `SUBMIT_FORM`,
+  TOGGLE: `TOGGLE`,
+  CHANGE_FAVORITE: `CHANGE_FAVORITE`
 };
 
 export const Controls = {

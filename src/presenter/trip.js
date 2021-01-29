@@ -2,44 +2,48 @@ import dayjs from "dayjs";
 import SortFormView from '../view/sort-form.js';
 import EmptyListTemplate from '../view/empty-list-template.js';
 import TripPointPresenter from './trip-point.js';
+import PickrsModel from '../model/pickrs.js';
 import {render, RenderPosition} from '../utils/render.js';
-import {updateItem} from '../utils/common.js';
 import {SortType, Controls, UserAction} from '../const.js';
 
 export default class Trip {
-  constructor(mainContainer, updateRouteInfo, pointsModel, controlsModel) {
+  constructor(mainContainer, updateRouteInfo, pointsModel, controlsModel, offersModel, destinationsModel) {
     this._pointsModel = pointsModel;
     this._controlsModel = controlsModel;
+    this._offersModel = offersModel;
+    this._destinationsModel = destinationsModel;
     this._mainContainer = mainContainer;
     this._tripEventsList = new EmptyListTemplate();
     this._sortComponent = new SortFormView();
     this._updateRouteInfo = updateRouteInfo;
     this._tripPresenters = {};
     this._currentSortType = SortType.DAY;
+    this._pickrsModel = new PickrsModel();
 
-    this._handlePointChange = this._handlePointChange.bind(this);
-    this._handleModeChange = this._handleModeChange.bind(this);
+    this._resetPointsView = this._resetPointsView.bind(this);
     this._handleChangeSortMode = this._handleChangeSortMode.bind(this);
     this._handleModelUpdate = this._handleModelUpdate.bind(this);
-    this._reRenderPointList = this._reRenderPointList.bind(this);
+    this._proceedModelUpdate = this._proceedModelUpdate.bind(this);
     this._handleFiltersChange = this._handleFiltersChange.bind(this);
 
-    this._pointsModel.addObserver(this._reRenderPointList);
+    this._pointsModel.addObserver(this._proceedModelUpdate);
     this._controlsModel.addObserver(this._handleFiltersChange);
   }
 
   init() {
-    this._points = this._getPoints();
-    this._renderSort();
+    if (this._getPoints().length) {
+      this._renderSort();
+    }
     render(this._mainContainer, this._tripEventsList.getElement(), RenderPosition.BEFOREEND);
-    this._renderPoints();
-    this._updateRouteInfo(this._points);
   }
 
-  _handleFiltersChange() {
-    this._currentSortType = SortType.DAY;
-    this._reRenderPointList();
+  _handleFiltersChange(userAction) {
     this._resetSort();
+    if (userAction !== UserAction.TOGGLE) {
+      this._proceedModelUpdate(userAction);
+    } else {
+      this._resetPointsView();
+    }
   }
 
   _getPoints() {
@@ -72,25 +76,32 @@ export default class Trip {
 
   _handleChangeSortMode(evt) {
     this._currentSortType = evt.target.value;
-    this._reRenderPointList();
+    this._proceedModelUpdate();
+    this._pointsModel.restorePoint();
   }
 
-  _handleModeChange() {
+  _resetPointsView() {
     Object
       .values(this._tripPresenters)
       .forEach((presenter) => presenter.resetView());
   }
 
-  _handlePointChange(updatedPoint) {
-    this._points = updateItem(this._points, updatedPoint);
-    this._tripPresenters[updatedPoint.id].init(updatedPoint);
-  }
-
-  _handleModelUpdate(userAction, point) {
+  _handleModelUpdate(userAction, pointId, update, errorFormAnimationCallback, removeEscapeEventListener) {
     switch (userAction) {
       case UserAction.DELETE_POINT: {
-        this._pointsModel.deletePoint(point);
+        this._pointsModel.deletePoint(userAction, pointId, update);
         break;
+      }
+      case UserAction.RESTORE_POINT: {
+        this._pointsModel.restorePoint();
+        break;
+      }
+      case UserAction.SUBMIT_FORM: {
+        this._pointsModel.updatePoint(userAction, pointId, update, errorFormAnimationCallback, removeEscapeEventListener);
+        break;
+      }
+      default: {
+        this._pointsModel.updatePoint(userAction, pointId, update);
       }
     }
   }
@@ -99,16 +110,45 @@ export default class Trip {
     return dayjs(point.time.end) - dayjs(point.time.start);
   }
 
-  _reRenderPointList() {
+  _reRenderPointList(userAction) {
+    if (userAction === UserAction.FILTER_CHANGE) {
+      this._pointsModel.restorePoint();
+    }
+    this._pickrsModel.clear();
     Object
       .values(this._tripPresenters)
       .forEach((presenter) => presenter.destroy());
+
     this._tripPresenters = {};
     this._points = this._getPoints();
+
     if (this._points.length) {
       this._renderPoints();
     }
-    this._updateRouteInfo(this._points);
+  }
+
+  _proceedModelUpdate(userAction, newPoint) {
+    switch (userAction) {
+      case UserAction.UPDATE_EDIT_POINT: {
+        this._reRenderPointList(userAction);
+        this._tripPresenters[newPoint.id]._replacePointToEdit();
+        break;
+      }
+      case UserAction.ADD_POINT: {
+        this._resetSort();
+        this._controlsModel.setFilter(Controls.EVERYTHING);
+        this._tripPresenters[newPoint.id]._replacePointToEdit(UserAction.ADD_POINT);
+        break;
+      }
+      case UserAction.RESTORE_POINT: {
+        this._reRenderPointList(userAction);
+        break;
+      }
+      default: {
+        this._reRenderPointList(userAction);
+        this._updateRouteInfo(this._getPoints());
+      }
+    }
   }
 
   _renderSort() {
@@ -117,10 +157,11 @@ export default class Trip {
   }
 
   _resetSort() {
+    this._currentSortType = SortType.DAY;
     this._sortComponent.getElement()
       .querySelectorAll(`input`)
       .forEach((input, index) => {
-        input.checked = index === 0 ? true : false;
+        input.checked = index === 0;
       });
   }
 
@@ -129,7 +170,14 @@ export default class Trip {
   }
 
   _renderPoint(point) {
-    const pointPresenter = new TripPointPresenter(this._tripEventsList, this._handlePointChange, this._handleModeChange, this._handleModelUpdate);
+    const pointPresenter = new TripPointPresenter(
+        this._tripEventsList,
+        this._resetPointsView,
+        this._handleModelUpdate,
+        this._offersModel.getOffers(),
+        this._destinationsModel.getDestinations(),
+        this._pickrsModel
+    );
     pointPresenter.init(point);
     this._tripPresenters[point.id] = pointPresenter;
   }

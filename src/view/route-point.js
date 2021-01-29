@@ -9,23 +9,23 @@ export default class RoutePoint extends AbstractView {
     this._destination = point.destination;
     this._tripType = point.tripType;
     this._time = point.time;
-    this._offers = point.offers;
     this._isFavorite = point.isFavorite;
     this._price = point.price;
-    this._clickHandler = this._clickHandler.bind(this);
+    this._editClickHandler = this._editClickHandler.bind(this);
     this._clickFavoriteHandler = this._clickFavoriteHandler.bind(this);
   }
 
   _generateOfferList() {
     let markup = ``;
-    if (!this._offers) {
+    const offersToDisplay = this._point.offers.filter((offer) => offer.isChecked);
+    if (!offersToDisplay) {
       markup += `<li class="event__offer"></li>`;
     } else {
-      for (let i = 0; i < this._offers.length; i++) {
+      for (let i = 0; i < offersToDisplay.length; i++) {
         markup += `<li class="event__offer">
-        <span class="event__offer-title">${this._offers[i].title}</span>
+        <span class="event__offer-title">${offersToDisplay[i].title}</span>
         &plus;&euro;&nbsp;
-        <span class="event__offer-price">${this._offers[i].price}</span>
+        <span class="event__offer-price">${offersToDisplay[i].price}</span>
         </li>`;
       }
     }
@@ -75,14 +75,14 @@ export default class RoutePoint extends AbstractView {
 </li>`;
   }
 
-  _clickHandler(evt) {
+  _editClickHandler(evt) {
     evt.preventDefault();
-    this._callback.click();
+    this._callback.editClick();
   }
 
   setEditClickHandler(callback) {
-    this._callback.click = callback;
-    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._clickHandler);
+    this._callback.editClick = callback;
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._editClickHandler);
   }
 
   _clickFavoriteHandler(evt) {

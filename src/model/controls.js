@@ -6,9 +6,9 @@ export default class ControlsModel extends Observer {
     this._selectedFilter = Controls.EVERYTHING;
   }
 
-  setFilter(selectedFilter) {
+  setFilter(selectedFilter, userAction) {
     this._selectedFilter = selectedFilter;
-    this.notify();
+    this.notify(userAction);
   }
 
   getFilter() {

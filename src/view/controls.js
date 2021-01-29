@@ -49,4 +49,7 @@ export default class ControlsView extends AbstractView {
     this.getElement().querySelector(`form`).addEventListener(`change`, this._changeHandler);
   }
 
+  setToggleHandler(callback) {
+    this._callback.toggle = callback;
+  }
 }

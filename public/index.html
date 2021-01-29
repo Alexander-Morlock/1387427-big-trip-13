@@ -12,11 +12,39 @@
 
 <body class="page-body">
   <header class="page-header">
+    <div>
+      <div style="
+      margin: auto;
+      border-radius: 50%;
+      width: 200px;
+      height: 200px;
+      background-color: #fff;
+      background-image: url('./img/loader.webp');
+      background-size: cover;
+      box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.35);">
+      </div>
+      <h1 style="text-align: center">LOADING...</h1>
+    </div>
   </header>
   <main class="page-body__page-main  page-main">
     <div class="page-body__container">
       <section class="trip-events">
         <h2 class="visually-hidden">Trip events</h2>
+      </section>
+      <section class="statistics visually-hidden">
+        <h2 class="visually-hidden">Trip statistics</h2>
+
+        <div class="statistics__item statistics__item--money">
+          <canvas class="statistics__chart  statistics__chart--money" width="900"></canvas>
+        </div>
+
+        <div class="statistics__item statistics__item--transport">
+          <canvas class="statistics__chart  statistics__chart--transport" width="900"></canvas>
+        </div>
+
+        <div class="statistics__item statistics__item--time-spend">
+          <canvas class="statistics__chart  statistics__chart--time" width="900"></canvas>
+        </div>
       </section>
     </div>
   </main>

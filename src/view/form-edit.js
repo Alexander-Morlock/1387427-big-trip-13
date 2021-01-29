@@ -1,12 +1,17 @@
-import dayjs from "dayjs";
-import SmartView from "./smart.js";
-import flatpickr from "flatpickr";
-import "../../node_modules/flatpickr/dist/flatpickr.min.css";
+import dayjs from 'dayjs';
+import SmartView from './smart.js';
+import flatpickr from 'flatpickr';
+import '../../node_modules/flatpickr/dist/flatpickr.min.css';
+import isSameOrAfter from '../../node_modules/dayjs/plugin/isSameOrAfter';
+import customParseFormat from '../../node_modules/dayjs/plugin/customParseFormat';
+dayjs.extend(isSameOrAfter);
+dayjs.extend(customParseFormat);
 
 export default class FormEdit extends SmartView {
-  constructor(point) {
+  constructor(point, offers, destinations, pickrsModel) {
     super();
-    this._data = FormEdit.parsePointToData(point);
+    this._data = this.parsePointToData(point, offers);
+    this._destinations = destinations;
     this._datePeakerStart = null;
     this._datePeakerEnd = null;
     this._clickSubmitHandler = this._clickSubmitHandler.bind(this);
@@ -14,62 +19,75 @@ export default class FormEdit extends SmartView {
     this._clickDeleteHandler = this._clickDeleteHandler.bind(this);
     this._startDateChangeHandler = this._startDateChangeHandler.bind(this);
     this._endDateChangeHandler = this._endDateChangeHandler.bind(this);
+    this._clickChangeHandler = this._clickChangeHandler.bind(this);
+    this._errorStartAnimation = this._errorStartAnimation.bind(this);
+    this._errorStopAnimation = this._errorStopAnimation.bind(this);
+    this._unblockForm = this._unblockForm.bind(this);
+    this._pickrsModel = pickrsModel;
     this._setInnerHandlers();
-    this._setDatepickers();
+  }
+
+  _setTripTypeChecked() {
+    this.getElement()
+    .querySelectorAll(`.event__type-input`)
+    .forEach((radio) => {
+      radio.checked = radio.value === this._data.tripType;
+    });
   }
 
   _setDatepickers() {
-    if (this._datePeakerStart) {
-      this._datePeakerStart.destroy();
-      this._datePeakerStart = null;
-      this._datePeakerEnd.destroy();
-      this._datePeakerEnd = null;
-    }
-
     this._datePeakerStart = flatpickr(
         this.getElement().querySelector(`#event-start-time-1`),
         {
           dateFormat: `d/m/y H:i`,
+          enableTime: true,
           defaultDate: dayjs(this._data.time.start).format(`DD/MM/YY hh:mm`),
           onChange: this._startDateChangeHandler
         }
     );
+
     this._datePeakerEnd = flatpickr(
         this.getElement().querySelector(`#event-end-time-1`),
         {
           dateFormat: `d/m/y H:i`,
+          enableTime: true,
           defaultDate: dayjs(this._data.time.end).format(`DD/MM/YY hh:mm`),
           onChange: this._endDateChangeHandler
         }
     );
+
+    this._pickrsModel.add(this._datePeakerStart);
+    this._pickrsModel.add(this._datePeakerEnd);
   }
 
   _startDateChangeHandler() {
-    const newStartDate = dayjs(
-        this.getElement().querySelector(`#event-start-time-1`).value
-    ).format(`YYYY-MM-DDThh:mm`);
-    const endDate = this._data.time.end;
     this.updateData(
         {
           time: {
-            start: newStartDate,
-            end: endDate
+            start: new Date(dayjs(
+                this.getElement()
+                .querySelector(`#event-start-time-1`)
+                .value, `DD/MM/YY hh:mm`)
+            ).toISOString(),
+            end: this._data.time.end
           }
-        });
+        }
+    );
   }
 
   _endDateChangeHandler() {
-    const newEndDate = dayjs(
-        this.getElement().querySelector(`#event-end-time-1`).value
-    ).format(`YYYY-MM-DDThh:mm`);
-    const startDate = this._data.time.start;
     this.updateData(
         {
           time: {
-            start: startDate,
-            end: newEndDate
+            start: this._data.time.start,
+            end: new Date(dayjs(
+                this.getElement()
+                .querySelector(`#event-end-time-1`)
+                .value, `DD/MM/YY hh:mm`)
+            ).toISOString()
           }
-        });
+        }
+    );
   }
 
   _generateOfferList() {
@@ -79,7 +97,7 @@ export default class FormEdit extends SmartView {
       return `<div class="event__available-offers">`
       + this._data.offers.map((offer, index) => {
         return `<div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-${index + 1}" type="checkbox" name="event-offer-${offer.type}">
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-${index + 1}" type="checkbox" name="event-offer-${offer.type}" ${offer.isChecked ? `checked` : ``}>
       <label class="event__offer-label" for="event-offer-${offer.type}-${index + 1}">
         <span class="event__offer-title">${offer.title} </span>&plus;&euro;&nbsp;
         <span class="event__offer-price">${offer.price}</span>
@@ -90,14 +108,12 @@ export default class FormEdit extends SmartView {
   }
 
   _generatePhotos() {
-    return this._data.destination.photoUrl.map((photo) => {
-      return `<img class="event__photo" src="${photo}" alt="Event photo">`;
-    }).join(``);
+    return this._data.destination.pictures.map((picture) => `<img class="event__photo" src="${picture.src}" alt="${picture.description}">`).join(``);
   }
 
   _generateDataList() {
     return `<datalist id="destination-list-1">
-    ${this._data.destinations.reduce((acc, destination) => {
+    ${this._destinations.reduce((acc, destination) => {
     return acc + `<option value="` + destination.title + `"></option>`;
   }, ``)}
     </datalist>`;
@@ -149,7 +165,7 @@ export default class FormEdit extends SmartView {
               </div>
 
               <div class="event__type-item">
-                <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight" checked>
+                <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight">
                 <label class="event__type-label  event__type-label--flight" for="event-type-flight-1">Flight</label>
               </div>
 
@@ -192,7 +208,7 @@ export default class FormEdit extends SmartView {
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${this._data.price}">
+          <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${this._data.price}">
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -220,14 +236,105 @@ export default class FormEdit extends SmartView {
   </li>`;
   }
 
+  _setClearOutlineListener(input) {
+    input.addEventListener(`input`, () => {
+      input.style.outline = `none`;
+    });
+  }
+
+  _validateDestination() {
+    const destinationTitleInput = this.getElement().querySelector(`.event__input--destination`);
+    this._setClearOutlineListener(destinationTitleInput);
+    if (
+      this._destinations.some((destination) => destination.title === this._data.destination.title)
+    ) {
+      return true;
+    } else {
+      destinationTitleInput.setCustomValidity(`Must be one from this list: ${this._destinations.map((destination) => destination.title).join(`, `)}`);
+      destinationTitleInput.reportValidity();
+      destinationTitleInput.style.outline = `3px solid #FF0000`;
+      return false;
+    }
+  }
+
+  _validateDates() {
+    const dateStartInput = this.getElement().querySelector(`#event-start-time-1`);
+    const dateEndInput = this.getElement().querySelector(`#event-end-time-1`);
+    this._setClearOutlineListener(dateEndInput);
+    this._setClearOutlineListener(dateStartInput);
+
+    if (dayjs(this._data.time.end).isSameOrAfter(this._data.time.start)) {
+      return true;
+    } else {
+      dateEndInput.style.outline = `3px solid #FF0000`;
+      dateStartInput.style.outline = `3px solid #FF0000`;
+      return false;
+    }
+  }
+
+  _validatePrice() {
+    const priceInput = this.getElement().querySelector(`#event-price-1`);
+    this._setClearOutlineListener(priceInput);
+
+    if (priceInput.value >= 0) {
+      this._data.price = +priceInput.value;
+      return true;
+    } else {
+      priceInput.style.outline = `3px solid #FF0000`;
+      return false;
+    }
+  }
+
+  _blockForm() {
+    this.getElement().querySelectorAll(`input`)
+        .forEach((input) => {
+          input.disabled = true;
+        });
+  }
+
+  _unblockForm() {
+    this.getElement().querySelectorAll(`input`)
+        .forEach((input) => {
+          input.disabled = false;
+        });
+    this.getElement().querySelector(`.event__save-btn`).textContent = `Save`;
+    this.getElement().querySelector(`.event__reset-btn`).textContent = `Delete`;
+  }
+
   _clickSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.formSubmit();
+
+    this._data.offers = Array.from(
+        this.getElement()
+        .querySelectorAll(`.event__offer-checkbox`))
+      .map((checkbox) => {
+        return {
+          title: checkbox.parentElement.querySelector(`.event__offer-title`).textContent.trim(),
+          price: parseInt(checkbox.parentElement.querySelector(`.event__offer-price`).textContent.trim(), 10),
+          isChecked: checkbox.checked,
+        };
+      });
+    this._data.unsaved = false;
+    if (this._validateDestination() && this._validateDates() && this._validatePrice()) {
+      this.getElement().querySelector(`.event__save-btn`).textContent = `Saving...`;
+      this._blockForm();
+      this._callback.formSubmit(this._data, this._errorStartAnimation);
+    }
   }
 
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
     this.getElement().querySelector(`.event__save-btn`).addEventListener(`click`, this._clickSubmitHandler);
+  }
+
+  _clickChangeHandler(evt) {
+    evt.preventDefault();
+    this._callback.eventChange(evt.target.value);
+  }
+
+  setEventTypeChangeHandler(callback) {
+    this._callback.eventChange = callback;
+    this.getElement().querySelector(`.event__type-group`).addEventListener(`change`, this._clickChangeHandler);
   }
 
   _clickMinimizeHandler(evt) {
@@ -242,7 +349,20 @@ export default class FormEdit extends SmartView {
 
   _clickDeleteHandler(evt) {
     evt.preventDefault();
-    this._callback.delete();
+    this.getElement().querySelector(`.event__reset-btn`).textContent = `Deleting...`;
+    this._blockForm();
+    this._callback.delete(this._errorStartAnimation);
+  }
+
+  _errorStopAnimation() {
+    this.getElement().querySelector(`form`).classList.remove(`form-error`);
+    this._unblockForm();
+  }
+
+  _errorStartAnimation() {
+    this._errorStopAnimation();
+    this.getElement().querySelector(`form`).classList.add(`form-error`);
+    window.setTimeout(this._errorStopAnimation, 500);
   }
 
   setDeleteClickHandler(callback) {
@@ -252,27 +372,39 @@ export default class FormEdit extends SmartView {
 
   setDestinationInputHandler() {
     const inputDestination = this.getElement().querySelector(`.event__input--destination`);
-    const valueBeforeChange = inputDestination.value;
-    inputDestination.addEventListener(`change`, () => {
-      if (this._data.destinations.some((destination) => destination.title === inputDestination.value)) {
-        const newDestination = this._data.destinations.find((destination) => destination.title === inputDestination.value);
+    inputDestination.addEventListener(`input`, () => {
+      if (this._destinations.some((destination) => destination.title === inputDestination.value)) {
+        const newDestination = this._destinations.find((destination) => destination.title === inputDestination.value);
         this.updateData(
             {
               destination: newDestination
             }
         );
-      } else {
-        inputDestination.value = valueBeforeChange;
       }
     });
   }
 
-  static parsePointToData(point) {
+  parsePointToData(point, offers) {
+    offers.forEach((offer) => {
+      const sameOffer = point.offers.find((pointOffer) => pointOffer.title === offer.title);
+      if (sameOffer) {
+        offer.isChecked = sameOffer.isChecked;
+      }
+    });
+
     return Object.assign(
         {},
         point,
         {
-          // additional fields here
+          destinations: this._destinations,
+          offers,
+          destination: {
+            description: point.id
+              ? point.destination.description
+              : `Unknown`,
+            title: point.destination.title,
+            pictures: point.destination.pictures
+          }
         }
     );
   }
@@ -281,11 +413,13 @@ export default class FormEdit extends SmartView {
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setMinimizeClickHandler(this._callback.minimize);
     this.setDestinationInputHandler();
+    this.setEventTypeChangeHandler(this._callback.eventChange);
+    this._setDatepickers();
+    this._setTripTypeChecked();
   }
 
   restoreHandlers() {
     this._setInnerHandlers();
-    this._setDatepickers();
   }
 
   removeElement() {
