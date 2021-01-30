@@ -1,11 +1,6 @@
-export const getRandomInteger = (a = 0, b = 1) => {
-  const lower = Math.ceil(Math.min(a, b));
-  const upper = Math.floor(Math.max(a, b));
+import dayjs from "dayjs";
 
-  return Math.floor(lower + Math.random() * (upper - lower + 1));
-};
-
-export const updateItem = (items, update) => {
+const updateItem = (items, update) => {
   const index = items.findIndex((item) => item.id === update.id);
 
   if (index === -1) {
@@ -19,4 +14,8 @@ export const updateItem = (items, update) => {
   ];
 };
 
-export const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
+const getDurationOfTrip = (point) => {
+  return dayjs(point.time.end) - dayjs(point.time.start);
+};
+
+export {updateItem, getDurationOfTrip};

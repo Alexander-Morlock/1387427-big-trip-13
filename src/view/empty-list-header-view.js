@@ -1,4 +1,4 @@
-import AbstractView from "./abstract.js";
+import AbstractView from "./abstract-view.js";
 
 export default class EmptyListHeader extends AbstractView {
   constructor() {
@@ -44,13 +44,13 @@ export default class EmptyListHeader extends AbstractView {
     </div>`;
   }
 
-  _clickNewEvent(evt) {
-    evt.preventDefault();
-    this._callback.newEvent();
-  }
-
   setNewEventHandler(callback) {
     this._callback.newEvent = callback;
     this.getElement().querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, this._clickNewEvent);
+  }
+
+  _clickNewEvent(evt) {
+    evt.preventDefault();
+    this._callback.newEvent();
   }
 }

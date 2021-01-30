@@ -1,7 +1,7 @@
 import Observer from '../utils/observer.js';
 import {UpdateType} from '../const.js';
 
-export default class Destinations extends Observer {
+export default class DestinationsModel extends Observer {
   constructor() {
     super();
     this._destinations = [];

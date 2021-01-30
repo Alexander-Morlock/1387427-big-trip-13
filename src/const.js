@@ -1,17 +1,17 @@
-export const UpdateType = {
+const UpdateType = {
   PATCH: `PATCH`,
   MINOR: `MINOR`,
   MAJOR: `MAJOR`,
   INIT: `INIT`
 };
 
-export const SortType = {
+const SortType = {
   DAY: `sort-day`,
   TIME: `sort-time`,
   PRICE: `sort-price`
 };
 
-export const UserAction = {
+const UserAction = {
   UPDATE_POINT: `UPDATE_POINT`,
   UPDATE_EDIT_POINT: `UPDATE_EDIT_POINT`,
   ADD_POINT: `ADD_POINT`,
@@ -23,10 +23,14 @@ export const UserAction = {
   CHANGE_FAVORITE: `CHANGE_FAVORITE`
 };
 
-export const Controls = {
+const Controls = {
   TABLE: `Table`,
   STATS: `Stats`,
   EVERYTHING: `everything`,
   FUTURE: `future`,
   PAST: `past`
 };
+
+const clearPointID = `_NeW_`;
+
+export {UpdateType, SortType, UserAction, Controls, clearPointID};

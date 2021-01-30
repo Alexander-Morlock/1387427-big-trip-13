@@ -1,10 +1,11 @@
 import dayjs from "dayjs";
-import SortFormView from '../view/sort-form.js';
-import EmptyListTemplate from '../view/empty-list-template.js';
-import TripPointPresenter from './trip-point.js';
-import PickrsModel from '../model/pickrs.js';
+import SortFormView from '../view/sort-form-view.js';
+import EmptyListTemplateView from '../view/empty-list-template-view.js';
+import TripPointPresenter from './trip-point-presenter.js';
+import PickrsModel from '../model/pickrs-model.js';
 import {render, RenderPosition} from '../utils/render.js';
-import {SortType, Controls, UserAction} from '../const.js';
+import {SortType, Controls, UserAction, clearPointID} from '../const.js';
+import {getDurationOfTrip} from '../utils/common.js';
 
 export default class Trip {
   constructor(mainContainer, updateRouteInfo, pointsModel, controlsModel, offersModel, destinationsModel) {
@@ -13,7 +14,7 @@ export default class Trip {
     this._offersModel = offersModel;
     this._destinationsModel = destinationsModel;
     this._mainContainer = mainContainer;
-    this._tripEventsList = new EmptyListTemplate();
+    this._tripEventsList = new EmptyListTemplateView();
     this._sortComponent = new SortFormView();
     this._updateRouteInfo = updateRouteInfo;
     this._tripPresenters = {};
@@ -63,13 +64,17 @@ export default class Trip {
 
     switch (this._currentSortType) {
       case SortType.TIME: {
-        return filteredPoints.sort((a, b) => this._getDurationOfTrip(b) - this._getDurationOfTrip(a));
+        return filteredPoints.sort((a, b) => getDurationOfTrip(b) - getDurationOfTrip(a));
       }
       case SortType.PRICE: {
         return filteredPoints.sort((a, b) => b.price - a.price);
       }
       default: {
-        return filteredPoints;
+        if (filteredPoints.length > 0 && filteredPoints[0].id !== clearPointID) {
+          return filteredPoints.sort((a, b) => dayjs(a.time.start) - dayjs(b.time.start));
+        } else {
+          return filteredPoints;
+        }
       }
     }
   }
@@ -104,10 +109,6 @@ export default class Trip {
         this._pointsModel.updatePoint(userAction, pointId, update);
       }
     }
-  }
-
-  _getDurationOfTrip(point) {
-    return dayjs(point.time.end) - dayjs(point.time.start);
   }
 
   _reRenderPointList(userAction) {

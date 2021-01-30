@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import {getDuration} from '../utils/render.js';
-import AbstractView from "./abstract.js";
+import AbstractView from "./abstract-view.js";
 
 export default class RoutePoint extends AbstractView {
   constructor(point) {
@@ -13,30 +13,6 @@ export default class RoutePoint extends AbstractView {
     this._price = point.price;
     this._editClickHandler = this._editClickHandler.bind(this);
     this._clickFavoriteHandler = this._clickFavoriteHandler.bind(this);
-  }
-
-  _generateOfferList() {
-    let markup = ``;
-    const offersToDisplay = this._point.offers.filter((offer) => offer.isChecked);
-    if (!offersToDisplay) {
-      markup += `<li class="event__offer"></li>`;
-    } else {
-      for (let i = 0; i < offersToDisplay.length; i++) {
-        markup += `<li class="event__offer">
-        <span class="event__offer-title">${offersToDisplay[i].title}</span>
-        &plus;&euro;&nbsp;
-        <span class="event__offer-price">${offersToDisplay[i].price}</span>
-        </li>`;
-      }
-    }
-
-    return markup;
-  }
-
-  _addCssClassIsFavorite() {
-    return this._isFavorite
-      ? ` event__favorite-btn--active`
-      : ``;
   }
 
   getTemplate() {
@@ -75,19 +51,9 @@ export default class RoutePoint extends AbstractView {
 </li>`;
   }
 
-  _editClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.editClick();
-  }
-
   setEditClickHandler(callback) {
     this._callback.editClick = callback;
     this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._editClickHandler);
-  }
-
-  _clickFavoriteHandler(evt) {
-    evt.preventDefault();
-    this._callback.clickFavorite();
   }
 
   setFavoriteClickHandler(callback) {
@@ -98,5 +64,39 @@ export default class RoutePoint extends AbstractView {
   removeElement() {
     this._element = null;
     this._point = null;
+  }
+
+  _generateOfferList() {
+    let markup = ``;
+    const offersToDisplay = this._point.offers.filter((offer) => offer.isChecked);
+    if (!offersToDisplay) {
+      markup += `<li class="event__offer"></li>`;
+    } else {
+      for (const offer of offersToDisplay) {
+        markup += `<li class="event__offer">
+        <span class="event__offer-title">${offer.title}</span>
+        &plus;&euro;&nbsp;
+        <span class="event__offer-price">${offer.price}</span>
+        </li>`;
+      }
+    }
+
+    return markup;
+  }
+
+  _addCssClassIsFavorite() {
+    return this._isFavorite
+      ? ` event__favorite-btn--active`
+      : ``;
+  }
+
+  _editClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.editClick();
+  }
+
+  _clickFavoriteHandler(evt) {
+    evt.preventDefault();
+    this._callback.clickFavorite();
   }
 }

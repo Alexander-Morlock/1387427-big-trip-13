@@ -1,13 +1,14 @@
-import ControlsView from '../view/controls.js';
+import ControlsView from '../view/controls-view.js';
 import {render, RenderPosition} from '../utils/render.js';
 import {Controls, UserAction} from '../const.js';
 import {showStatistics} from '../stats.js';
 
 export default class ControlsClass {
-  constructor(controlsModel, addNewPointCallback) {
+  constructor(controlsModel, pointModel) {
+    this._points = pointModel.getPoints();
     this._controlsModel = controlsModel;
-    this._addNewPointCallback = addNewPointCallback;
-    this._controlsComponent = new ControlsView(this._controlsModel.getFilter());
+    this._addNewPointCallback = pointModel.addPoint;
+    this._controlsComponent = new ControlsView(this._controlsModel.getFilter(), this._points);
     this._renderAfterElement = document.querySelector(`.trip-main__trip-info`);
     this._filtersChangeAction = this._filtersChangeAction.bind(this);
     this.resetControls = this.resetControls.bind(this);
@@ -16,15 +17,10 @@ export default class ControlsClass {
     document.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, this._clickNewEvent);
   }
 
-  init(points) {
-    this._points = points;
+  init() {
     render(this._renderAfterElement, this._controlsComponent.getElement(), RenderPosition.AFTER);
     this._controlsComponent.setChangeHandler(this._filtersChangeAction);
     this.setPageToggle();
-  }
-
-  _filtersChangeAction(evt) {
-    this._controlsModel.setFilter(evt.target.value, UserAction.FILTER_CHANGE);
   }
 
   resetControls() {
@@ -38,9 +34,9 @@ export default class ControlsClass {
     const statsViewLink = this._controlsComponent.getElement().querySelectorAll(`.trip-tabs__btn`)[1];
     const controls = this._controlsComponent.getElement().querySelectorAll(`.trip-filters__filter-input`);
 
-    const onKeydownHandler = (evt) => {
+    const onDocumentKeydown = (evt) => {
       if (evt.key === `Escape`) {
-        document.removeEventListener(`keydown`, onKeydownHandler);
+        document.removeEventListener(`keydown`, onDocumentKeydown);
         toggleToTable(evt);
       }
     };
@@ -59,7 +55,7 @@ export default class ControlsClass {
       this._statsContainer.classList.remove(`visually-hidden`);
       this._pointsContainer.classList.add(`visually-hidden`);
 
-      document.addEventListener(`keydown`, onKeydownHandler);
+      document.addEventListener(`keydown`, onDocumentKeydown);
 
       showStatistics(this._points);
     };
@@ -79,6 +75,10 @@ export default class ControlsClass {
     };
 
     statsViewLink.addEventListener(`click`, toggleToStatistics);
+  }
+
+  _filtersChangeAction(evt) {
+    this._controlsModel.setFilter(evt.target.value, UserAction.FILTER_CHANGE);
   }
 
   _clickNewEvent(evt) {

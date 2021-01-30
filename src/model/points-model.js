@@ -1,6 +1,5 @@
 import Observer from '../utils/observer.js';
-import {UserAction} from '../const.js';
-const clearPointID = `_NeW_`;
+import {UserAction, clearPointID} from '../const.js';
 
 export default class Points extends Observer {
   constructor(api) {

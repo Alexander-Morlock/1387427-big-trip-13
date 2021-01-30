@@ -1,12 +1,12 @@
-import RouteInfoView from './view/route-info.js';
-import EmptyListHeaderView from './view/empty-list-header.js';
-import NoPointsView from './view/empty-trip-events.js';
-import TripPresenter from './presenter/trip.js';
-import PointsModel from './model/points.js';
-import OffersModel from './model/offers.js';
-import DestinationsModel from './model/destinations.js';
-import ControlsPresenter from './presenter/controls.js';
-import ControlsModel from './model/controls.js';
+import RouteInfoView from './view/route-info-view.js';
+import EmptyListHeaderView from './view/empty-list-header-view.js';
+import NoPointsView from './view/no-points-view.js';
+import TripPresenter from './presenter/trip-presenter.js';
+import PointsModel from './model/points-model.js';
+import OffersModel from './model/offers-model.js';
+import DestinationsModel from './model/destinations-model.js';
+import ControlsPresenter from './presenter/controls-presenter.js';
+import ControlsModel from './model/controls-model.js';
 import Api from './api.js';
 import {render, RenderPosition} from './utils/render.js';
 import {UpdateType} from './const.js';
@@ -38,8 +38,8 @@ const updateRouteInfo = (points, resetCallback) => {
     }
     routeInfoView = new RouteInfoView(points, resetCallback);
     render(headerContainer, routeInfoView.getElement(), RenderPosition.AFTERBEGIN);
-    const controlsPresenter = new ControlsPresenter(controlsModel, pointsModel.addPoint);
-    controlsPresenter.init(pointsModel.getPoints());
+    const controlsPresenter = new ControlsPresenter(controlsModel, pointsModel);
+    controlsPresenter.init();
 
   } else {
     if (pointsModel.getPoints().length) {

@@ -1,17 +1,17 @@
-import Abstract from "../view/abstract.js";
+import AbstractView from "../view/abstract-view.js";
 
-export const RenderPosition = {
+const RenderPosition = {
   AFTERBEGIN: `afterbegin`,
   BEFOREEND: `beforeend`,
   AFTER: `after`
 };
 
-export const render = (container, child, place) => {
-  if (container instanceof Abstract) {
+const render = (container, child, place) => {
+  if (container instanceof AbstractView) {
     container = container.getElement();
   }
 
-  if (child instanceof Abstract) {
+  if (child instanceof AbstractView) {
     child = child.getElement();
   }
 
@@ -28,22 +28,22 @@ export const render = (container, child, place) => {
   }
 };
 
-export const renderTemplate = (container, template, place) => {
-  if (container instanceof Abstract) {
+const renderTemplate = (container, template, place) => {
+  if (container instanceof AbstractView) {
     container = container.getElement();
   }
 
   container.insertAdjacentHTML(place, template);
 };
 
-export const createElement = (template) => {
+const createElement = (template) => {
   const newElement = document.createElement(`div`);
   newElement.innerHTML = template;
 
   return newElement.firstChild;
 };
 
-export const getDuration = (timeStart, timeEnd) => {
+const getDuration = (timeStart, timeEnd) => {
   const start = new Date(timeStart).getTime();
   const end = new Date(timeEnd).getTime();
   const durationMinutes = Math.floor(Math.abs(end - start) / 60000); // in minutes
@@ -74,12 +74,12 @@ export const getDuration = (timeStart, timeEnd) => {
   return duration;
 };
 
-export const replace = (newChild, oldChild) => {
-  if (oldChild instanceof Abstract) {
+const replace = (newChild, oldChild) => {
+  if (oldChild instanceof AbstractView) {
     oldChild = oldChild.getElement();
   }
 
-  if (newChild instanceof Abstract) {
+  if (newChild instanceof AbstractView) {
     newChild = newChild.getElement();
   }
 
@@ -92,11 +92,13 @@ export const replace = (newChild, oldChild) => {
   parent.replaceChild(newChild, oldChild);
 };
 
-export const remove = (component) => {
-  if (!(component instanceof Abstract)) {
+const remove = (component) => {
+  if (!(component instanceof AbstractView)) {
     throw new Error(`Can remove only components`);
   }
 
   component.getElement().remove();
   component.removeElement();
 };
+
+export {RenderPosition, render, renderTemplate, createElement, getDuration, replace, remove};

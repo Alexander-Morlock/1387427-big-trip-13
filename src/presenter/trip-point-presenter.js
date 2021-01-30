@@ -1,5 +1,5 @@
-import PointEditView from '../view/form-edit.js';
-import PointView from '../view/route-point.js';
+import PointEditView from '../view/form-edit-view.js';
+import PointView from '../view/point-view.js';
 import {render, RenderPosition, replace, remove} from "../utils/render.js";
 import {UserAction} from '../const.js';
 
@@ -29,26 +29,6 @@ export default class TripPoint {
     this._replacePointToEdit = this._replacePointToEdit.bind(this);
     this._handleEventTypeChange = this._handleEventTypeChange.bind(this);
     this._removeEscapeEventListener = this._removeEscapeEventListener.bind(this);
-  }
-
-  _reCreatePointView() {
-    this._pointComponent = new PointView(this._point);
-    this._pointComponent.setEditClickHandler(this._replacePointToEdit);
-    this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
-  }
-
-  _reCreatePointEditView() {
-    this._pointEditComponent = new PointEditView(
-        this._point,
-        this._offersForThisPoint,
-        this._destinations,
-        this._pickrsModel
-    );
-
-    this._pointEditComponent.setFormSubmitHandler(this._handleSubmitForm);
-    this._pointEditComponent.setMinimizeClickHandler(this._handleReplaceEditToPoint);
-    this._pointEditComponent.setDeleteClickHandler(this._handleDeletePoint);
-    this._pointEditComponent.setEventTypeChangeHandler(this._handleEventTypeChange);
   }
 
   init(point) {
@@ -85,6 +65,26 @@ export default class TripPoint {
     if (this._mode !== Mode.DEFAULT) {
       this._replaceEditToPoint();
     }
+  }
+
+  _reCreatePointView() {
+    this._pointComponent = new PointView(this._point);
+    this._pointComponent.setEditClickHandler(this._replacePointToEdit);
+    this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+  }
+
+  _reCreatePointEditView() {
+    this._pointEditComponent = new PointEditView(
+        this._point,
+        this._offersForThisPoint,
+        this._destinations,
+        this._pickrsModel
+    );
+
+    this._pointEditComponent.setFormSubmitHandler(this._handleSubmitForm);
+    this._pointEditComponent.setMinimizeClickHandler(this._handleReplaceEditToPoint);
+    this._pointEditComponent.setDeleteClickHandler(this._handleDeletePoint);
+    this._pointEditComponent.setEventTypeChangeHandler(this._handleEventTypeChange);
   }
 
   _replacePointToEdit(userAction) {

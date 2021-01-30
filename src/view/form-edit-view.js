@@ -1,9 +1,9 @@
 import dayjs from 'dayjs';
-import SmartView from './smart.js';
+import SmartView from './smart-view.js';
 import flatpickr from 'flatpickr';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
-import isSameOrAfter from '../../node_modules/dayjs/plugin/isSameOrAfter';
-import customParseFormat from '../../node_modules/dayjs/plugin/customParseFormat';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 dayjs.extend(isSameOrAfter);
 dayjs.extend(customParseFormat);
 
@@ -25,98 +25,6 @@ export default class FormEdit extends SmartView {
     this._unblockForm = this._unblockForm.bind(this);
     this._pickrsModel = pickrsModel;
     this._setInnerHandlers();
-  }
-
-  _setTripTypeChecked() {
-    this.getElement()
-    .querySelectorAll(`.event__type-input`)
-    .forEach((radio) => {
-      radio.checked = radio.value === this._data.tripType;
-    });
-  }
-
-  _setDatepickers() {
-    this._datePeakerStart = flatpickr(
-        this.getElement().querySelector(`#event-start-time-1`),
-        {
-          dateFormat: `d/m/y H:i`,
-          enableTime: true,
-          defaultDate: dayjs(this._data.time.start).format(`DD/MM/YY hh:mm`),
-          onChange: this._startDateChangeHandler
-        }
-    );
-
-    this._datePeakerEnd = flatpickr(
-        this.getElement().querySelector(`#event-end-time-1`),
-        {
-          dateFormat: `d/m/y H:i`,
-          enableTime: true,
-          defaultDate: dayjs(this._data.time.end).format(`DD/MM/YY hh:mm`),
-          onChange: this._endDateChangeHandler
-        }
-    );
-
-    this._pickrsModel.add(this._datePeakerStart);
-    this._pickrsModel.add(this._datePeakerEnd);
-  }
-
-  _startDateChangeHandler() {
-    this.updateData(
-        {
-          time: {
-            start: new Date(dayjs(
-                this.getElement()
-                .querySelector(`#event-start-time-1`)
-                .value, `DD/MM/YY hh:mm`)
-            ).toISOString(),
-            end: this._data.time.end
-          }
-        }
-    );
-  }
-
-  _endDateChangeHandler() {
-    this.updateData(
-        {
-          time: {
-            start: this._data.time.start,
-            end: new Date(dayjs(
-                this.getElement()
-                .querySelector(`#event-end-time-1`)
-                .value, `DD/MM/YY hh:mm`)
-            ).toISOString()
-          }
-        }
-    );
-  }
-
-  _generateOfferList() {
-    if (!this._data.offers) {
-      return ``;
-    } else {
-      return `<div class="event__available-offers">`
-      + this._data.offers.map((offer, index) => {
-        return `<div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-${index + 1}" type="checkbox" name="event-offer-${offer.type}" ${offer.isChecked ? `checked` : ``}>
-      <label class="event__offer-label" for="event-offer-${offer.type}-${index + 1}">
-        <span class="event__offer-title">${offer.title} </span>&plus;&euro;&nbsp;
-        <span class="event__offer-price">${offer.price}</span>
-      </label>
-    </div>`;
-      }).join(``);
-    }
-  }
-
-  _generatePhotos() {
-    return this._data.destination.pictures.map((picture) => `<img class="event__photo" src="${picture.src}" alt="${picture.description}">`).join(``);
-  }
-
-  _generateDataList() {
-    return `<datalist id="destination-list-1">
-    ${this._destinations.reduce((acc, destination) => {
-    return acc + `<option value="` + destination.title + `"></option>`;
-  }, ``)}
-    </datalist>`;
   }
 
   getTemplate() {
@@ -236,6 +144,165 @@ export default class FormEdit extends SmartView {
   </li>`;
   }
 
+  setFormSubmitHandler(callback) {
+    this._callback.formSubmit = callback;
+    this.getElement().querySelector(`.event__save-btn`).addEventListener(`click`, this._clickSubmitHandler);
+  }
+
+  setEventTypeChangeHandler(callback) {
+    this._callback.eventChange = callback;
+    this.getElement().querySelector(`.event__type-group`).addEventListener(`change`, this._clickChangeHandler);
+  }
+
+  setMinimizeClickHandler(callback) {
+    this._callback.minimize = callback;
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._clickMinimizeHandler);
+  }
+
+  setDeleteClickHandler(callback) {
+    this._callback.delete = callback;
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._clickDeleteHandler);
+  }
+
+  setDestinationInputHandler() {
+    const inputDestination = this.getElement().querySelector(`.event__input--destination`);
+    inputDestination.addEventListener(`input`, () => {
+      if (this._destinations.some((destination) => destination.title === inputDestination.value)) {
+        const newDestination = this._destinations.find((destination) => destination.title === inputDestination.value);
+        this.updateData(
+            {
+              destination: newDestination
+            }
+        );
+      }
+    });
+  }
+
+  parsePointToData(point, offers) {
+    offers.forEach((offer) => {
+      const sameOffer = point.offers.find((pointOffer) => pointOffer.title === offer.title);
+      if (sameOffer) {
+        offer.isChecked = sameOffer.isChecked;
+      }
+    });
+
+    return Object.assign(
+        {},
+        point,
+        {
+          destinations: this._destinations,
+          offers,
+          destination: {
+            description: point.id
+              ? point.destination.description
+              : `Unknown`,
+            title: point.destination.title,
+            pictures: point.destination.pictures
+          }
+        }
+    );
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+
+  _setTripTypeChecked() {
+    this.getElement()
+    .querySelectorAll(`.event__type-input`)
+    .forEach((radio) => {
+      radio.checked = radio.value === this._data.tripType;
+    });
+  }
+
+  _setDatepickers() {
+    this._datePeakerStart = flatpickr(
+        this.getElement().querySelector(`#event-start-time-1`),
+        {
+          dateFormat: `d/m/y H:i`,
+          enableTime: true,
+          defaultDate: dayjs(this._data.time.start).format(`DD/MM/YY hh:mm`),
+          onChange: this._startDateChangeHandler
+        }
+    );
+
+    this._datePeakerEnd = flatpickr(
+        this.getElement().querySelector(`#event-end-time-1`),
+        {
+          dateFormat: `d/m/y H:i`,
+          enableTime: true,
+          defaultDate: dayjs(this._data.time.end).format(`DD/MM/YY hh:mm`),
+          onChange: this._endDateChangeHandler
+        }
+    );
+
+    this._pickrsModel.add(this._datePeakerStart);
+    this._pickrsModel.add(this._datePeakerEnd);
+  }
+
+  _startDateChangeHandler() {
+    this.updateData(
+        {
+          time: {
+            start: new Date(dayjs(
+                this.getElement()
+                .querySelector(`#event-start-time-1`)
+                .value, `DD/MM/YY hh:mm`)
+            ).toISOString(),
+            end: this._data.time.end
+          }
+        }
+    );
+  }
+
+  _endDateChangeHandler() {
+    this.updateData(
+        {
+          time: {
+            start: this._data.time.start,
+            end: new Date(dayjs(
+                this.getElement()
+                .querySelector(`#event-end-time-1`)
+                .value, `DD/MM/YY hh:mm`)
+            ).toISOString()
+          }
+        }
+    );
+  }
+
+  _generateOfferList() {
+    if (!this._data.offers) {
+      return ``;
+    } else {
+      return `<div class="event__available-offers">`
+      + this._data.offers.map((offer, index) => {
+        return `<div class="event__offer-selector">
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-${index + 1}" type="checkbox" name="event-offer-${offer.type}" ${offer.isChecked ? `checked` : ``}>
+      <label class="event__offer-label" for="event-offer-${offer.type}-${index + 1}">
+        <span class="event__offer-title">${offer.title} </span>&plus;&euro;&nbsp;
+        <span class="event__offer-price">${offer.price}</span>
+      </label>
+    </div>`;
+      }).join(``);
+    }
+  }
+
+  _generatePhotos() {
+    return this._data.destination.pictures.map((picture) => `<img class="event__photo" src="${picture.src}" alt="${picture.description}">`).join(``);
+  }
+
+  _generateDataList() {
+    return `<datalist id="destination-list-1">
+    ${this._destinations.reduce((acc, destination) => {
+    return acc + `<option value="` + destination.title + `"></option>`;
+  }, ``)}
+    </datalist>`;
+  }
+
   _setClearOutlineListener(input) {
     input.addEventListener(`input`, () => {
       input.style.outline = `none`;
@@ -322,29 +389,14 @@ export default class FormEdit extends SmartView {
     }
   }
 
-  setFormSubmitHandler(callback) {
-    this._callback.formSubmit = callback;
-    this.getElement().querySelector(`.event__save-btn`).addEventListener(`click`, this._clickSubmitHandler);
-  }
-
   _clickChangeHandler(evt) {
     evt.preventDefault();
     this._callback.eventChange(evt.target.value);
   }
 
-  setEventTypeChangeHandler(callback) {
-    this._callback.eventChange = callback;
-    this.getElement().querySelector(`.event__type-group`).addEventListener(`change`, this._clickChangeHandler);
-  }
-
   _clickMinimizeHandler(evt) {
     evt.preventDefault();
     this._callback.minimize();
-  }
-
-  setMinimizeClickHandler(callback) {
-    this._callback.minimize = callback;
-    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._clickMinimizeHandler);
   }
 
   _clickDeleteHandler(evt) {
@@ -365,50 +417,6 @@ export default class FormEdit extends SmartView {
     window.setTimeout(this._errorStopAnimation, 500);
   }
 
-  setDeleteClickHandler(callback) {
-    this._callback.delete = callback;
-    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._clickDeleteHandler);
-  }
-
-  setDestinationInputHandler() {
-    const inputDestination = this.getElement().querySelector(`.event__input--destination`);
-    inputDestination.addEventListener(`input`, () => {
-      if (this._destinations.some((destination) => destination.title === inputDestination.value)) {
-        const newDestination = this._destinations.find((destination) => destination.title === inputDestination.value);
-        this.updateData(
-            {
-              destination: newDestination
-            }
-        );
-      }
-    });
-  }
-
-  parsePointToData(point, offers) {
-    offers.forEach((offer) => {
-      const sameOffer = point.offers.find((pointOffer) => pointOffer.title === offer.title);
-      if (sameOffer) {
-        offer.isChecked = sameOffer.isChecked;
-      }
-    });
-
-    return Object.assign(
-        {},
-        point,
-        {
-          destinations: this._destinations,
-          offers,
-          destination: {
-            description: point.id
-              ? point.destination.description
-              : `Unknown`,
-            title: point.destination.title,
-            pictures: point.destination.pictures
-          }
-        }
-    );
-  }
-
   _setInnerHandlers() {
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setMinimizeClickHandler(this._callback.minimize);
@@ -417,13 +425,4 @@ export default class FormEdit extends SmartView {
     this._setDatepickers();
     this._setTripTypeChecked();
   }
-
-  restoreHandlers() {
-    this._setInnerHandlers();
-  }
-
-  removeElement() {
-    this._element = null;
-  }
-
 }

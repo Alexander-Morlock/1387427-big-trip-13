@@ -1,4 +1,4 @@
-import AbstractView from "./abstract.js";
+import AbstractView from "./abstract-view.js";
 
 export default class SortForm extends AbstractView {
   constructor() {
@@ -35,14 +35,14 @@ export default class SortForm extends AbstractView {
   </form>`;
   }
 
-  _clickHandler(evt) {
-    evt.preventDefault();
-    this._callback.change(evt);
-  }
-
   setChangeSortModeHandler(callback) {
     this._callback.change = callback;
     this.getElement().addEventListener(`change`, this._clickHandler);
+  }
+
+  _clickHandler(evt) {
+    evt.preventDefault();
+    this._callback.change(evt);
   }
 }
 
