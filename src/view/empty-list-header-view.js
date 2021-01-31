@@ -1,8 +1,10 @@
 import AbstractView from "./abstract-view.js";
+import {UserAction} from '../const.js';
 
-export default class EmptyListHeader extends AbstractView {
-  constructor() {
+export default class EmptyListHeaderView extends AbstractView {
+  constructor(controlsModel) {
     super();
+    this._controlsModel = controlsModel;
     this._clickNewEvent = this._clickNewEvent.bind(this);
   }
 
@@ -47,10 +49,35 @@ export default class EmptyListHeader extends AbstractView {
   setNewEventHandler(callback) {
     this._callback.newEvent = callback;
     this.getElement().querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, this._clickNewEvent);
+    this._handleControlsNotify = this._handleControlsNotify.bind(this);
+    this._controlsModel.addObserver(this._handleControlsNotify);
+  }
+
+  _handleControlsNotify(userAction) {
+    if (userAction === UserAction.ONLINE) {
+      this._switchToOnline();
+    } else if (userAction === UserAction.OFFLINE) {
+      this._switchToOffline();
+    }
   }
 
   _clickNewEvent(evt) {
     evt.preventDefault();
-    this._callback.newEvent();
+    document.querySelector(`.trip-events__msg`).remove();
+    this._callback.newEvent(UserAction.ADD_FIRST_POINT);
+  }
+
+  _switchToOffline() {
+    const addNewEventButton = this.getElement().querySelector(`.trip-main__event-add-btn`);
+    addNewEventButton.textContent = `OFFLINE`;
+    addNewEventButton.classList.add(`btn--red`);
+    addNewEventButton.disabled = true;
+  }
+
+  _switchToOnline() {
+    const addNewEventButton = this.getElement().querySelector(`.trip-main__event-add-btn`);
+    addNewEventButton.textContent = `New event`;
+    addNewEventButton.classList.remove(`btn--red`);
+    addNewEventButton.disabled = false;
   }
 }

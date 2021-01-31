@@ -167,6 +167,9 @@ main {
   .btn--yellow {
     color: #424242;
     background-color: #ffd054; }
+  .btn--red {
+    background-color: #ff0000;
+    color: #fff;}
   .btn--blue {
     color: #ffffff;
     background-color: #0d8ae4; }

@@ -18,11 +18,11 @@ export default class Points extends Observer {
     return this._points.slice();
   }
 
-  addPoint() {
+  addPoint(userAction = UserAction.ADD_POINT) {
     this._pointToRestore = null;
     const newPoint = this._createEmptyPoint();
     this._points.unshift(newPoint);
-    this.notify(UserAction.ADD_POINT, newPoint);
+    this.notify(userAction, newPoint);
   }
 
   deletePoint(userAction, id, errorFormAnimationCallback) {

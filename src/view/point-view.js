@@ -13,6 +13,7 @@ export default class RoutePoint extends AbstractView {
     this._price = point.price;
     this._editClickHandler = this._editClickHandler.bind(this);
     this._clickFavoriteHandler = this._clickFavoriteHandler.bind(this);
+    this.getElement().querySelector(`.event__rollup-btn`).disabled = !window.navigator.onLine;
   }
 
   getTemplate() {

@@ -7,11 +7,11 @@ import OffersModel from './model/offers-model.js';
 import DestinationsModel from './model/destinations-model.js';
 import ControlsPresenter from './presenter/controls-presenter.js';
 import ControlsModel from './model/controls-model.js';
-import Api from './api.js';
+import Api from './api/api.js';
 import {render, RenderPosition} from './utils/render.js';
 import {UpdateType} from './const.js';
 
-const AUTHORIZATION = `Basic bQ3NRTa9a6jfYotQyR_7`;
+const AUTHORIZATION = `Basic bQ3NRTa9a6jfYotQyR_8`;
 const END_POINT = `https://13.ecmascript.pages.academy/big-trip`;
 const api = new Api(END_POINT, AUTHORIZATION);
 
@@ -42,18 +42,21 @@ const updateRouteInfo = (points, resetCallback) => {
     controlsPresenter.init();
 
   } else {
-    if (pointsModel.getPoints().length) {
-      RouteInfoView.showNoResults(controlsModel.getFilter());
-    } else {
-      headerContainer.children[0].remove();
-      const emptyListHeaderView = new EmptyListHeaderView();
-      render(headerContainer, emptyListHeaderView.getElement(), RenderPosition.AFTERBEGIN);
-      emptyListHeaderView.setNewEventHandler(pointsModel.addPoint);
-      noPointsView = new NoPointsView();
-      tripEventsContainer.append(noPointsView.getElement());
+    headerContainer.children[0].remove();
+    const sortForm = document.querySelector(`.trip-events__trip-sort`);
+    if (sortForm) {
+      sortForm.remove();
     }
+    const emptyListHeaderView = new EmptyListHeaderView(controlsModel);
+    render(headerContainer, emptyListHeaderView.getElement(), RenderPosition.AFTERBEGIN);
+    emptyListHeaderView.setNewEventHandler(pointsModel.addPoint);
+    noPointsView = new NoPointsView();
+    tripEventsContainer.append(noPointsView.getElement());
   }
 };
+
+window.addEventListener(`online`, controlsModel.switchToOnline);
+window.addEventListener(`offline`, controlsModel.switchToOffline);
 
 const presenter = new TripPresenter(
     tripEventsContainer,

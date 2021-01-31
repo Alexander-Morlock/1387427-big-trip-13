@@ -13,8 +13,14 @@ export default class ControlsClass {
     this._filtersChangeAction = this._filtersChangeAction.bind(this);
     this.resetControls = this.resetControls.bind(this);
     this._clickNewEvent = this._clickNewEvent.bind(this);
+    this._handleControlsNotify = this._handleControlsNotify.bind(this);
+    this._controlsModel.addObserver(this._handleControlsNotify);
 
-    document.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, this._clickNewEvent);
+    this._addNewEventButton = document.querySelector(`.trip-main__event-add-btn`);
+    this._addNewEventButton.addEventListener(`click`, this._clickNewEvent);
+    if (!window.navigator.onLine) {
+      this._switchToOffline();
+    }
   }
 
   init() {
@@ -77,6 +83,43 @@ export default class ControlsClass {
     statsViewLink.addEventListener(`click`, toggleToStatistics);
   }
 
+  _handleControlsNotify(userAction) {
+    if (userAction === UserAction.ONLINE) {
+      this._switchToOnline();
+    } else if (userAction === UserAction.OFFLINE) {
+      this._switchToOffline();
+    }
+  }
+
+  _switchToOffline() {
+    this._addNewEventButton.textContent = `OFFLINE`;
+    this._addNewEventButton.classList.add(`btn--red`);
+    this._addNewEventButton.disabled = true;
+
+    document.querySelectorAll(`.event__rollup-btn`)
+      .forEach((e, i) => {
+        e.disabled = i > 0 ? true : !document.querySelector(`.event__save-btn`);
+      });
+
+    const formEdit = document.querySelector(`.event--edit`);
+    if (formEdit) {
+      formEdit.classList.add(`form-error`);
+      window.setTimeout(() => {
+        formEdit.classList.remove(`form-error`);
+      }, 500);
+    }
+  }
+
+  _switchToOnline() {
+    this._addNewEventButton.textContent = `New event`;
+    this._addNewEventButton.classList.remove(`btn--red`);
+    this._addNewEventButton.disabled = false;
+    document.querySelectorAll(`.event__rollup-btn`)
+      .forEach((e) => {
+        e.disabled = false;
+      });
+  }
+
   _filtersChangeAction(evt) {
     this._controlsModel.setFilter(evt.target.value, UserAction.FILTER_CHANGE);
   }
@@ -85,6 +128,10 @@ export default class ControlsClass {
     evt.preventDefault();
     this._statsContainer.classList.add(`visually-hidden`);
     this._pointsContainer.classList.remove(`visually-hidden`);
+    const sortForm = document.querySelector(`.trip-events__trip-sort`);
+    if (sortForm) {
+      sortForm.style = `display: flex`;
+    }
     this._addNewPointCallback();
   }
 }

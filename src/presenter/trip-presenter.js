@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import SortFormView from '../view/sort-form-view.js';
 import EmptyListTemplateView from '../view/empty-list-template-view.js';
+import NoPointsView from '../view/no-points-view.js';
 import TripPointPresenter from './trip-point-presenter.js';
 import PickrsModel from '../model/pickrs-model.js';
 import {render, RenderPosition} from '../utils/render.js';
@@ -39,11 +40,13 @@ export default class Trip {
   }
 
   _handleFiltersChange(userAction) {
-    this._resetSort();
-    if (userAction !== UserAction.TOGGLE) {
-      this._proceedModelUpdate(userAction);
-    } else {
-      this._resetPointsView();
+    if (userAction !== UserAction.OFFLINE && userAction !== UserAction.ONLINE) {
+      this._resetSort();
+      if (userAction !== UserAction.TOGGLE) {
+        this._proceedModelUpdate(userAction);
+      } else {
+        this._resetPointsView();
+      }
     }
   }
 
@@ -141,8 +144,23 @@ export default class Trip {
         this._tripPresenters[newPoint.id]._replacePointToEdit(UserAction.ADD_POINT);
         break;
       }
+      case UserAction.ADD_FIRST_POINT: {
+        this._renderSort();
+        this._controlsModel.setFilter(Controls.EVERYTHING);
+        this._tripPresenters[newPoint.id]._replacePointToEdit(UserAction.ADD_POINT);
+        break;
+      }
       case UserAction.RESTORE_POINT: {
-        this._reRenderPointList(userAction);
+        if (this._getPoints().length) {
+          this._reRenderPointList(userAction);
+        } else {
+          document.querySelector(`.trip-main__trip-info`).remove();
+          document.querySelector(`.trip-events__item`).remove();
+          if (!document.querySelector(`.trip-events__msg`)) {
+            this._mainContainer.append(new NoPointsView().getElement());
+            this._sortComponent.getElement().style = `display: none`;
+          }
+        }
         break;
       }
       default: {
@@ -153,7 +171,7 @@ export default class Trip {
   }
 
   _renderSort() {
-    render(this._mainContainer, this._sortComponent.getElement(), RenderPosition.BEFOREEND);
+    render(this._mainContainer, this._sortComponent.getElement(), RenderPosition.AFTERBEGIN);
     this._sortComponent.setChangeSortModeHandler(this._handleChangeSortMode);
   }
 

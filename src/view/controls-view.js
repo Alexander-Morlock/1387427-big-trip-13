@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import AbstractView from "./abstract-view.js";
 import {Controls} from '../const.js';
+import {clearPointID} from '../const.js';
 
 export default class ControlsView extends AbstractView {
 
@@ -35,7 +36,7 @@ export default class ControlsView extends AbstractView {
                 </div>
 
                 <div class="trip-filters__filter">
-                  <input ${isPastPoints ? `` : `disabled`} id="filter-past" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="past" ${this._selectedFilter === Controls.PAST ? `checked` : ``}>
+                  <input ${isPastPoints && this._points[0].id !== clearPointID ? `` : `disabled`} id="filter-past" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="past" ${this._selectedFilter === Controls.PAST ? `checked` : ``}>
                   <label class="trip-filters__filter-label" for="filter-past">Past</label>
                 </div>
 

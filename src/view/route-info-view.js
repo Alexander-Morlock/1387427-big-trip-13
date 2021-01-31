@@ -36,15 +36,11 @@ export default class RouteInfo extends AbstractView {
   }
 
   _generateRouteTitle() {
-    const cities = [];
-    cities.push(this._points[0].destination.title);
-    if (this._points.length > 1) {
-      for (let i = 1; i < this._points.length; i++) {
-        if (this._points[i].destination.title !== this._points[i - 1].destination.title) {
-          cities.push(this._points[i].destination.title);
-        }
-      }
-    }
+    const cities = this._points
+      .filter((point, index, points) => {
+        return index === 0 || point.destination.title !== points[index - 1].destination.title;
+      }).map((point) => point.destination.title);
+
     return cities.length < 4 ? cities.join(` — `) : cities[0] + ` - ... - ` + cities[cities.length - 1];
   }
 
@@ -57,11 +53,5 @@ export default class RouteInfo extends AbstractView {
             : totalOffers;
         }, 0);
     }, 0);
-  }
-
-  static showNoResults(selectedFilter) {
-    document.querySelector(`.trip-info__title`).textContent = `No results for «${selectedFilter}» filter`.toUpperCase();
-    document.querySelector(`.trip-info__dates`).textContent = `No dates to display`;
-    document.querySelector(`.trip-info__cost-value`).textContent = `0`;
   }
 }

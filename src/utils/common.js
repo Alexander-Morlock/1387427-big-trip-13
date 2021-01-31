@@ -18,4 +18,8 @@ const getDurationOfTrip = (point) => {
   return dayjs(point.time.end) - dayjs(point.time.start);
 };
 
-export {updateItem, getDurationOfTrip};
+const isOnline = () => {
+  return window.navigator.onLine;
+};
+
+export {updateItem, getDurationOfTrip, isOnline};
